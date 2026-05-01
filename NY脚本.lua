@@ -3,16 +3,16 @@ local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- 基础路径与初始化
+-- 基础路径
 local Paths = {
-    FishingMain = Player.PlayerGui:WaitForChild("MainGui"):WaitForChild("Fishing"),
-    SkillFrame = Player.PlayerGui.MainGui.Fishing:WaitForChild("SkillButton"):WaitForChild("Frame"),
-    BarFrame = Player.PlayerGui.MainGui.Fishing:WaitForChild("BarFrame"),
-    Bar = Player.PlayerGui.MainGui.Fishing.BarFrame:WaitForChild("Bar"),
-    MobileFishing = Player.PlayerGui.MainGui:WaitForChild("Mobile"):WaitForChild("Fishing")
+    FishingMain = LocalPlayer.PlayerGui:WaitForChild("MainGui"):WaitForChild("Fishing"),
+    SkillFrame = LocalPlayer.PlayerGui.MainGui.Fishing:WaitForChild("SkillButton"):WaitForChild("Frame"),
+    BarFrame = LocalPlayer.PlayerGui.MainGui.Fishing:WaitForChild("BarFrame"),
+    Bar = LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame:WaitForChild("Bar"),
+    MobileFishing = LocalPlayer.PlayerGui.MainGui:WaitForChild("Mobile"):WaitForChild("Fishing")
 }
 
 _G.AutoFishing = false
@@ -23,27 +23,25 @@ _G.AutoSkills = false
 _G.SelectedSkills = {} 
 _G.SelectedIsland = "初始岛"
 
--- 穿墙变量
+-- 穿墙数据
 local NoclipEnabled = false
 local NoclipConnection = nil
 
--- 飞行变量
+-- 飞行数据
 local nowe = false
 local speeds = 1
 local tpwalking = false
 
--- 战斗变量
+-- 战斗与透视变量
 local AimAssistEnabled = false
 local AimOffsetY = 0
 local TrackingRange = 500
-
--- 透视相关变量
 local ESPEnabled, NPCESPEnabled = false, false
 local PlayerUIStorage, NPCUIStorage = {}, {} 
 local ESPSettings = {ShowHighlight = false, ShowName = false, ShowHealth = false, ShowDistance = false, MaxDistance = 500}
 local NPCSettings = {ShowHighlight = false, ShowName = false, ShowHealth = false, ShowDistance = false, MaxDistance = 500}
 
--- 基础函数
+-- 点击功能
 local function click(btn)
     if not btn then return end
     pcall(function()
@@ -56,6 +54,7 @@ local function click(btn)
     end)
 end
 
+-- 音效功能
 local function playEffectSound()
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://87437544236708"
@@ -64,15 +63,15 @@ local function playEffectSound()
     sound.Ended:Connect(function() sound:Destroy() end)
 end
 
-local function getHumanoid() return Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") end
+local function getHumanoid() return LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") end
 
--- 穿墙逻辑
+-- 穿墙功能逻辑
 local function enableNoclip()
     if NoclipEnabled then return end
     NoclipEnabled = true
     NoclipConnection = RunService.Stepped:Connect(function()
         if not NoclipEnabled then return end
-        local character = Player.Character
+        local character = LocalPlayer.Character
         if not character then return end
         for _, part in ipairs(character:GetDescendants()) do
             if part:IsA("BasePart") and part.CanCollide then part.CanCollide = false end
@@ -84,7 +83,7 @@ local function disableNoclip()
     if not NoclipEnabled then return end
     NoclipEnabled = false
     if NoclipConnection then NoclipConnection:Disconnect(); NoclipConnection = nil end
-    local character = Player.Character
+    local character = LocalPlayer.Character
     if character then
         for _, part in ipairs(character:GetDescendants()) do
             if part:IsA("BasePart") then part.CanCollide = true end
@@ -92,7 +91,7 @@ local function disableNoclip()
     end
 end
 
--- 飞行逻辑代码
+-- 飞行功能代码
 local function toggleFly()
     if nowe == true then
         nowe = false
@@ -121,15 +120,15 @@ local function toggleFly()
             spawn(function()
                 local hb = RunService.Heartbeat    
                 tpwalking = true
-                while tpwalking and hb:Wait() and Player.Character and getHumanoid() and getHumanoid().Parent do
+                while tpwalking and hb:Wait() and LocalPlayer.Character and getHumanoid() and getHumanoid().Parent do
                     if getHumanoid().MoveDirection.Magnitude > 0 then
-                        Player.Character:TranslateBy(getHumanoid().MoveDirection)
+                        LocalPlayer.Character:TranslateBy(getHumanoid().MoveDirection)
                     end
                 end
             end)
         end
         
-        if Player.Character:FindFirstChild("Animate") then Player.Character.Animate.Disabled = true end
+        if LocalPlayer.Character:FindFirstChild("Animate") then LocalPlayer.Character.Animate.Disabled = true end
         local hum = getHumanoid()
         if hum then
             for i,v in next, hum:GetPlayingAnimationTracks() do v:AdjustSpeed(0) end
@@ -153,7 +152,7 @@ local function toggleFly()
     end
 
     spawn(function()
-        local char = Player.Character
+        local char = LocalPlayer.Character
         if not char then return end
         local hum = getHumanoid()
         local isR6 = (hum.RigType == Enum.HumanoidRigType.R6)
@@ -170,11 +169,11 @@ local function toggleFly()
         if nowe == true then hum.PlatformStand = true end
         
         local ctrl = {f = 0, b = 0, l = 0, r = 0}
-        local flySpeedBase = 50 
+        local speed = 50 
 
         while nowe == true and hum.Health > 0 do
             RunService.RenderStepped:Wait()
-            bv.velocity = ((Camera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((Camera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - Camera.CoordinateFrame.p))*flySpeedBase
+            bv.velocity = ((Camera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((Camera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - Camera.CoordinateFrame.p))*speed
             bg.cframe = Camera.CoordinateFrame
         end
         bg:Destroy()
@@ -187,9 +186,9 @@ local function toggleFly()
     end)
 end
 
--- 透视核心逻辑
+-- 透视显示功能
 local function createESP(target, isPlayer, storage, settings)
-    if isPlayer and target == Player then return end
+    if isPlayer and target == LocalPlayer then return end
     local function setup(character)
         if not character or storage[target] then return end
         local hum = character:WaitForChild("Humanoid", 10)
@@ -218,7 +217,7 @@ local function createESP(target, isPlayer, storage, settings)
         local conn = RunService.RenderStepped:Connect(function()
             local currentEnabled = isPlayer and ESPEnabled or NPCESPEnabled
             if not character.Parent or not currentEnabled then billboard.Enabled = false; highlight.Enabled = false; return end
-            local myRoot = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+            local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             if not myRoot then return end
             local dist = (root.Position - myRoot.Position).Magnitude
             if dist <= settings.MaxDistance then
@@ -237,14 +236,14 @@ local function createESP(target, isPlayer, storage, settings)
     end
 end
 
--- UI构建
+-- UI
 local Window = WindUI:CreateWindow({ 
     Title = "NY脚本", 
     Size = UDim2.fromOffset(580, 600), 
     Theme = "Dark" 
 })
 
--- 自动钓鱼
+-- 自动钓鱼功能
 local FishingSection = Window:Section({ Title = "重型钓鱼", Opened = true })
 local TabFishAuto = FishingSection:Tab({ Title = "自动钓鱼", Icon = "anchor" })
 local TabFishTP = FishingSection:Tab({ Title = "钓鱼传送", Icon = "map" })
@@ -263,20 +262,52 @@ TabFishAuto:Dropdown({
 TabFishAuto:Toggle({ Title = "自动技能", Default = false, Callback = function(v) _G.AutoSkills = v end })
 TabFishAuto:Dropdown({ Title = "技能选择", Multi = true, Values = {"Z", "X", "C", "V"}, Callback = function(v) _G.SelectedSkills = v end })
 
+-- 岛屿数据包含全鱼类信息
 local IslandData = {
-    ["初始岛"] = { Pos = Vector3.new(-221.18, 10, -26.04), Info = "包含: 鳟鱼, 金枪鱼, 斑鱼" },
-    ["竹子岛"] = { Pos = Vector3.new(-1223.00, 10, -24.25), Info = "包含: 银金枪鱼, 草鲤鱼" },
-    ["核弹岛"] = { Pos = Vector3.new(48.90, 10, 1186.60), Info = "包含: 带刺三文鱼" },
-    ["主权岛"] = { Pos = Vector3.new(-1215.80, 10, 1244.59), Info = "包含: 幼年焦龙" },
-    ["鲈鱼岛"] = { Pos = Vector3.new(-65.69, 10, -1338.62), Info = "包含: 长老鲈鱼" },
-    ["冰霜岛"] = { Pos = Vector3.new(-1324.89, 10, -1398.24), Info = "包含: 坤鱼" }
+    ["初始岛"] = { 
+        Pos = Vector3.new(-221.18, 10, -26.04), 
+        Info = "包含: 鳟鱼, 金枪鱼, 猩红金枪鱼, 翡翠金枪鱼, 斑鱼, 金色金枪鱼, 皇家金枪鱼, 傲慢鱼, 白金金枪鱼, 电流草金枪鱼, 蔚蓝色金枪鱼" 
+    },
+    ["竹子岛"] = { 
+        Pos = Vector3.new(-1223.00, 10, -24.25), 
+        Info = "包含: 长角银金枪鱼, 黑色鳍草鲤鱼, 猩红草鲤鱼, 金鳞草鲤鱼, 玫瑰鳍金枪鱼, 蔚蓝色草金枪鱼, 统治草鳗鱼, 龙头金枪鱼, 长老龙头金枪鱼, 杰奥龙龙鱼" 
+    },
+    ["核弹岛"] = { 
+        Pos = Vector3.new(48.90, 10, 1186.60), 
+        Info = "包含: 带刺三文鱼, 斑甲金枪鱼, 蔚蓝色鳟鱼, 日光斑金枪鱼, 符文喇叭组合器, 钢铁之鳍潜水员, 被链接的鲨鱼" 
+    },
+    ["主权岛"] = { 
+        Pos = Vector3.new(-1215.80, 10, 1244.59), 
+        Info = "包含: 边界眼鱼, 幼年焦龙鱼, 黄金鲤鱼, 龙步鲤鱼, 地面老虎深水鱼(I-III), 成年焦龙鱼, 年长锁链鲨鱼, 长老奥龙龙鱼, 真形焦龙鱼" 
+    },
+    ["鲈鱼岛"] = { 
+        Pos = Vector3.new(-65.69, 10, -1338.62), 
+        Info = "包含: 长老鲈鱼(I-VIII), 老鱼珀奇I, 真形鲈鱼, 晋升鲈鱼\n秘密头目: 飞鱼皇帝、飞鱼女皇" 
+    },
+    ["冰霜岛"] = { 
+        Pos = Vector3.new(-1324.89, 10, -1398.24), 
+        Info = "包含: 肉食鱼, 坤鱼(I-III), 成年坤鱼, 长老坤鱼, 原始坤鱼, 原始坤鱼霸主\n秘密头目: 重生羽绒兽" 
+    },
+    ["椰子岛"] = { 
+        Pos = Vector3.new(1493.61, 10, -1430.62), 
+        Info = "包含: 装甲战斗鱼, 黑暗战斗鱼, 龙战斗鱼, 幻影战斗鱼, 绯红战鲤鱼, 翡翠战鲤鱼, 战争伟者鲨鱼, 巨型石斑鱼, 突变独角鲸鱼" 
+    },
+    ["琥珀岛"] = { 
+        Pos = Vector3.new(1259.41, 10, 1401.48), 
+        Info = "包含: 沙猫鱼, 深渊光辉鱼, 青金石鱼, 草鲤鱼, 猩红边缘头, 风暴鳞片塔托格, 黑暗鳞片鱼, 闪耀金鱼, 蛇鱼, 恐惧鳗鱼, 彩色锦鲤, 有毒彩色锦鲤" 
+    },
+    ["战场岛"] = { 
+        Pos = Vector3.new(1393.49, 10, 169.63), 
+        Info = "包含: 绯红金霸主, 白银光辉霸主, 巨型虎鱼" 
+    }
 }
-local SortedIslands = {"初始岛", "竹子岛", "核弹岛", "主权岛", "鲈鱼岛", "冰霜岛"}
+
+local SortedIslands = {"初始岛", "竹子岛", "核弹岛", "主权岛", "鲈鱼岛", "冰霜岛", "椰子岛", "琥珀岛", "战场岛"}
 local FishInfoDisplay = TabFishTP:Paragraph({ Title = "地图详细信息", Desc = IslandData["初始岛"].Info })
 TabFishTP:Dropdown({ Title = "选择地图", Values = SortedIslands, Callback = function(v) _G.SelectedIsland = v; FishInfoDisplay:SetDesc(IslandData[v].Info) end })
-TabFishTP:Button({ Title = "开始传送", Callback = function() local data = IslandData[_G.SelectedIsland] if data and Player.Character then Player.Character.HumanoidRootPart.CFrame = CFrame.new(data.Pos + Vector3.new(0, 5, 0)) end end })
+TabFishTP:Button({ Title = "开始传送", Callback = function() local data = IslandData[_G.SelectedIsland] if data and LocalPlayer.Character then LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(data.Pos + Vector3.new(0, 5, 0)) end end })
 
--- 玩家管理
+-- 玩家页
 local PlayerSection = Window:Section({ Title = "玩家管理", Opened = false })
 local TabAttr = PlayerSection:Tab({ Title = "属性修改", Icon = "user" })
 
@@ -286,22 +317,20 @@ TabAttr:Toggle({ Title = "修改跳跃", Callback = function(s) playEffectSound(
 TabAttr:Input({ Title = "跳跃数值", Callback = function(v) TargetJumpPower = tonumber(v) or 50 end })
 TabAttr:Toggle({ Title = "无限跳跃", Callback = function(s) playEffectSound(); InfiniteJumpEnabled = s end })
 TabAttr:Divider()
-TabAttr:Toggle({ Title = "穿墙模式", Callback = function(v) playEffectSound() if v then enableNoclip() else disableNoclip() end end })
+TabAttr:Toggle({ Title = "穿墙功能", Callback = function(v) playEffectSound() if v then enableNoclip() else disableNoclip() end end })
 TabAttr:Button({ Title = "重置角色", Callback = function() playEffectSound(); if getHumanoid() then getHumanoid().Health = 0 end end })
 
--- 飞行功能独立Tab
+-- 飞行功能包括但不限于Text和Title
 local TabFly = PlayerSection:Tab({ Title = "飞行功能", Icon = "user" })
 TabFly:Toggle({ Title = "开启飞行", Callback = function(v) playEffectSound() if v ~= nowe then toggleFly() end end })
 TabFly:Input({ Title = "飞行速度", Placeholder = "1", Callback = function(v) speeds = tonumber(v) or 1 end })
 
--- 视觉辅助
-local VisualSection = Window:Section({ Title = "视觉辅助" })
-local TabVis = VisualSection:Tab({ Title = "透视辅助", Icon = "eye" })
-
+-- 视觉辅助页包括选择器
+local TabVis = Window:Section({ Title = "视觉辅助" }):Tab({ Title = "透视辅助", Icon = "eye" })
 TabVis:Toggle({ Title = "全图亮度", Callback = function(s) playEffectSound(); Lighting.Brightness = s and 2 or 1; Lighting.GlobalShadows = not s end })
 TabVis:Divider()
 TabVis:Toggle({ Title = "玩家透视", Callback = function(s) playEffectSound(); ESPEnabled = s; if s then for _, p in pairs(Players:GetPlayers()) do createESP(p, true, PlayerUIStorage, ESPSettings) end end end })
-TabVis:Dropdown({ Title = "玩家显示选择", Multi = true, Values = {"轮廓高亮", "显示名字", "显示血量", "显示距离"}, Callback = function(v) 
+TabVis:Dropdown({ Title = "玩家透视选择器", Multi = true, Values = {"轮廓高亮", "显示名字", "显示血量", "显示距离"}, Callback = function(v) 
     ESPSettings.ShowHighlight = table.find(v, "轮廓高亮") ~= nil
     ESPSettings.ShowName = table.find(v, "显示名字") ~= nil
     ESPSettings.ShowHealth = table.find(v, "显示血量") ~= nil
@@ -309,30 +338,27 @@ TabVis:Dropdown({ Title = "玩家显示选择", Multi = true, Values = {"轮廓�
 end })
 TabVis:Divider()
 TabVis:Toggle({ Title = "NPC透视", Callback = function(s) playEffectSound(); NPCESPEnabled = s; if s then for _, v in pairs(workspace:GetDescendants()) do if v:IsA("Humanoid") and not Players:GetPlayerFromCharacter(v.Parent) then createESP(v.Parent, false, NPCUIStorage, NPCSettings) end end end end })
-TabVis:Dropdown({ Title = "NPC显示选择", Multi = true, Values = {"轮廓高亮", "显示名字", "显示血量", "显示距离"}, Callback = function(v) 
+TabVis:Dropdown({ Title = "NPC透视选择器", Multi = true, Values = {"轮廓高亮", "显示名字", "显示血量", "显示距离"}, Callback = function(v) 
     NPCSettings.ShowHighlight = table.find(v, "轮廓高亮") ~= nil
     NPCSettings.ShowName = table.find(v, "显示名字") ~= nil
     NPCSettings.ShowHealth = table.find(v, "显示血量") ~= nil
     NPCSettings.ShowDistance = table.find(v, "显示距离") ~= nil
 end })
 
--- 战斗增强
-local CombatSection = Window:Section({ Title = "战斗增强" })
-local TabAim = CombatSection:Tab({ Title = "自动瞄准", Icon = "target" })
+-- 战斗功能
+local TabAim = Window:Section({ Title = "战斗增强" }):Tab({ Title = "自动瞄准", Icon = "target" })
 TabAim:Toggle({ Title = "开启自瞄", Callback = function(s) playEffectSound(); AimAssistEnabled = s end })
 TabAim:Input({ Title = "瞄准偏移", Callback = function(v) AimOffsetY = tonumber(v) or 0 end })
-TabAim:Input({ Title = "自瞄范围", Callback = function(v) TrackingRange = tonumber(v) or 500 end })
 
--- 传送系统
+-- 传送页
 local TabTP = Window:Section({ Title = "传送系统" }):Tab({ Title = "玩家传送", Icon = "map-pin" })
-local function getPlrs() local t = {} for _, v in ipairs(Players:GetPlayers()) do if v ~= Player then table.insert(t, v.DisplayName .. " [" .. v.Name .. "]") end end return t end
-local PlrDrop = TabTP:Dropdown({ Title = "选择玩家", Values = getPlrs(), Callback = function(v) SelectedTeleportPlayer = v:match("%[(.-)%]") end })
+local function getPlrs() local t = {} for _, v in ipairs(Players:GetPlayers()) do if v ~= LocalPlayer then table.insert(t, v.DisplayName .. " [" .. v.Name .. "]") end end return t end
+local PlrDrop = TabTP:Dropdown({ Title = "选择玩家", Values = getPlrs(), Callback = function(v) _G.SelectedPlayerName = v:match("%[(.-)%]") end })
 TabTP:Button({ Title = "刷新列表", Callback = function() PlrDrop:SetValues(getPlrs()) end })
-TabTP:Button({ Title = "点击传送", Callback = function() playEffectSound(); if SelectedTeleportPlayer then local t = Players:FindFirstChild(SelectedTeleportPlayer) if t and t.Character then Player.Character:SetPrimaryPartCFrame(t.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)) end end end })
+TabTP:Button({ Title = "点击传送", Callback = function() playEffectSound(); if _G.SelectedPlayerName then local t = Players:FindFirstChild(_G.SelectedPlayerName) if t and t.Character then LocalPlayer.Character:SetPrimaryPartCFrame(t.Character.HumanoidRootPart.CFrame * CFrame.new(0, 4, 0)) end end end })
 
--- 核心循环监听
+-- 强锁功能逻辑
 RunService.RenderStepped:Connect(function()
-    -- 进度条锁定
     if _G.LockBar and Paths.BarFrame.Visible then
         if _G.LockMode == "爆竿" then
             Paths.Bar.Position = UDim2.new(-0.1, 0, 0.5, 0)
@@ -340,12 +366,12 @@ RunService.RenderStepped:Connect(function()
             Paths.Bar.Position = UDim2.new(0.5, 0, 0.5, 0)
         end
     end
-    -- 自动瞄准
+    -- 自瞄逻辑
     if AimAssistEnabled then
         local nearest, dist = nil, TrackingRange
         for _, p in pairs(Players:GetPlayers()) do
-            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                local d = (p.Character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
+            if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local d = (p.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
                 if d < dist then nearest = p.Character.HumanoidRootPart; dist = d end
             end
         end
@@ -353,7 +379,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- 自动功能循环
+-- 技能功能循环
 task.spawn(function()
     while task.wait(0.1) do
         if _G.AutoSkills and Paths.FishingMain.Visible then
@@ -365,6 +391,7 @@ task.spawn(function()
     end
 end)
 
+-- 自动抛竿功能
 task.spawn(function()
     local wasVisible = false
     while task.wait(0.1) do
@@ -377,8 +404,8 @@ task.spawn(function()
     end
 end)
 
--- 角色死亡处理
-Player.CharacterAdded:Connect(function(char)
+-- 重生功能处理
+LocalPlayer.CharacterAdded:Connect(function(char)
     wait(0.7)
     nowe = false
     if NoclipEnabled then
@@ -388,5 +415,5 @@ Player.CharacterAdded:Connect(function(char)
     end
 end)
 
--- 无限跳跃
+-- 连跳功能监听
 UserInputService.JumpRequest:Connect(function() if InfiniteJumpEnabled then local h = getHumanoid() if h then h:ChangeState("Jumping") end end end)
