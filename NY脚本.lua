@@ -23,6 +23,7 @@ _G.LockMode = "控鱼"
 _G.AutoSkills = false
 _G.SelectedSkills = {} 
 _G.SelectedIsland = "初始岛"
+_G.AutoSell = false
 
 -- 穿墙数据
 local NoclipEnabled = false
@@ -345,6 +346,8 @@ TabFishAuto:Dropdown({
 TabFishAuto:Toggle({ Title = "自动技能", Default = false, Callback = function(v) _G.AutoSkills = v end })
 TabFishAuto:Dropdown({ Title = "技能选择", Multi = true, Values = {"Z", "X", "C", "V"}, Callback = function(v) _G.SelectedSkills = v end })
 
+TabFishAuto:Toggle({ Title = "自动卖鱼", Default = false, Callback = function(v) playEffectSound(); _G.AutoSell = v end })
+
 -- 鱼类信息与传送
 local IslandData = {
     ["初始岛"] = { Pos = Vector3.new(-221.18, 10, -26.04), Info = "包含: 鳟鱼, 金枪鱼, 猩红金枪鱼, 翡翠金枪鱼, 斑鱼, 金色金枪鱼, 皇家金枪鱼, 傲慢鱼, 白金金枪鱼, 电流草金枪鱼, 蔚蓝色金枪鱼" },
@@ -448,7 +451,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- 自动功能循环
+-- 自动技能循环
 task.spawn(function()
     while task.wait(0.1) do
         if _G.AutoSkills and Paths.FishingMain.Visible then
@@ -460,6 +463,7 @@ task.spawn(function()
     end
 end)
 
+-- 自动抛竿循环
 task.spawn(function()
     local wasVisible = false
     while task.wait(0.1) do
@@ -467,6 +471,24 @@ task.spawn(function()
         if _G.AutoFishing and wasVisible and not isVisible then
             task.wait(_G.FishingDelay)
             click(Paths.MobileFishing)
+        end
+        wasVisible = isVisible
+    end
+end)
+
+-- 自动卖鱼循环
+task.spawn(function()
+    local wasVisible = false
+    while task.wait(0.1) do
+        local isVisible = Paths.FishingMain.Visible
+        if _G.AutoSell and wasVisible and not isVisible then
+            local pGui = LocalPlayer:FindFirstChild("PlayerGui")
+            if pGui and pGui:FindFirstChild("MainGui") and pGui.MainGui:FindFirstChild("Menu") and pGui.MainGui.Menu:FindFirstChild("Sell") and pGui.MainGui.Menu.Sell:FindFirstChild("Choose") then
+                local sellBtn = pGui.MainGui.Menu.Sell.Choose:FindFirstChild("All")
+                if sellBtn then
+                    click(sellBtn)
+                end
+            end
         end
         wasVisible = isVisible
     end
