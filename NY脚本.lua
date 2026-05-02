@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
@@ -278,7 +279,7 @@ local function createESP(target, isPlayer, storage, settings)
             return l
         end
         
-        local nameLabel = createLabel(true) -- 名字加粗
+        local nameLabel = createLabel(true)
         nameLabel.Text = isPlayer and target.DisplayName or target.Name
         local healthLabel = createLabel(false)
         local distLabel = createLabel(false)
@@ -294,7 +295,6 @@ local function createESP(target, isPlayer, storage, settings)
                 highlight.Enabled = settings.ShowHighlight
                 billboard.Enabled = true
                 
-                -- 高亮轮廓内部颜色计算（100%血量为绿，0%为红）
                 local hpPerc = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
                 highlight.FillColor = Color3.fromHSV(hpPerc * 0.3, 1, 1)
                 
@@ -385,7 +385,6 @@ TabFly:Input({ Title = "飞行速度", Placeholder = "1", Callback = function(v)
 local VisualSection = Window:Section({ Title = "视觉辅助" })
 local TabVis = VisualSection:Tab({ Title = "透视辅助", Icon = "eye" })
 
--- 高亮模式与输入框替换
 TabVis:Toggle({ Title = "高亮模式", Callback = function(s) playEffectSound(); if s then enableBrightness() else disableBrightness() end end })
 TabVis:Input({ Title = "亮度调节", Placeholder = "输入数值...", Callback = function(v) local val = tonumber(v); if val and BrightnessEnabled then Lighting.Brightness = val end end })
 TabVis:Button({ Title = "恢复默认亮度", Callback = function() playEffectSound(); if BrightnessEnabled then disableBrightness() end Lighting.Brightness = 1; Lighting.Ambient = Color3.new(0, 0, 0); Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5); Lighting.GlobalShadows = true; Lighting.ClockTime = 14 end })
@@ -433,7 +432,7 @@ RunService.RenderStepped:Connect(function()
             Paths.Bar.Position = UDim2.new(0.5, 0, 0.5, 0)
         end
     end
-    -- 自瞄逻辑
+    -- 自瞄逻辑修复实现
     if AimAssistEnabled and (tick() - LastAimTime) >= AimAssistInterval then
         local nearest, dist = nil, TrackingRange
         for _, p in pairs(Players:GetPlayers()) do
@@ -471,6 +470,12 @@ task.spawn(function()
         end
         wasVisible = isVisible
     end
+end)
+
+-- 反挂机逻辑
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
 end)
 
 -- 角色重生处理逻辑
