@@ -1,7 +1,16 @@
--- 恶魔学
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua"))()
+--功能所属：脚本初始化
+
+local Library = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua"
+))()
+
+local ThemeManager = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua"
+))()
+
+local SaveManager = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua"
+))()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -12,7 +21,7 @@ local CoreGui = game:GetService("CoreGui")
 
 local LocalPlayer = Players.LocalPlayer
 
--- 脚本：防重复执行
+--功能所属：防重复执行
 
 local ScriptRunningFlag = "_SiScript_IsRunning"
 
@@ -25,12 +34,15 @@ if getrenv()[ScriptRunningFlag] then
         sound:Play()
         Debris:AddItem(sound, 3)
     end)
+
     return
 end
 
 getrenv()[ScriptRunningFlag] = true
 
 local ScriptClosed = false
+
+--功能所属：提示音
 
 local function playNotifySound()
     pcall(function()
@@ -47,14 +59,14 @@ local originalNotify = Library.Notify
 
 Library.Notify = function(self, text, duration)
     playNotifySound()
-    return originalNotify(self, text, 1)
+    return originalNotify(self, text, duration or 1)
 end
 
--- 主界面：俟脚本
+--功能所属：主界面
 
 local Window = Library:CreateWindow({
-    Title = "NY恶魔学",
-    Footer = "测试版V0.1",
+    Title = "俟脚本",
+    Footer = "创作者测试",
     ToggleKeybind = Enum.KeyCode.C,
     Center = true,
     AutoShow = true,
@@ -69,7 +81,7 @@ local TabPlayer = Window:AddTab("玩家", "eye", "玩家功能")
 local TabMap = Window:AddTab("地图", "map", "地图功能")
 local TabSettings = Window:AddTab("设置", "settings", "存档设置")
 
--- 翻译：名称
+--功能所属：翻译
 
 local TranslationMap = {
     ["Male"] = "男",
@@ -101,70 +113,69 @@ local TranslationMap = {
     ["Base Camp"] = "基地营地",
     ["Service Station"] = "服务站",
     ["Main Store"] = "主商店",
-        ["Master Closet"] = "主卧衣帽间",
+    ["Master Closet"] = "主壁橱",
     ["Blue Bedroom"] = "蓝色卧室",
     ["Pink Bedroom"] = "粉色卧室",
     ["Pantry"] = "食品储藏室",
-    ["F2 Dining Area"] = "二楼用餐区",
-    ["Scullery"] = "配膳洗涤间",
-    ["Staff Room"] = "员工休息室",
-    ["Coffee Bar"] = "咖啡吧台",
-    ["Restroom 2"] = "二号卫生间",
-    ["Restroom 1"] = "一号卫生间",
-    ["Meeting Room 2"] = "二号会议室",
-    ["Meeting Room 1"] = "一号会议室",
-    ["F1 Dining Area"] = "一楼用餐区",
-    ["Alley"] = "小巷/过道",
-    ["Lounge"] = "休闲厅",
+    ["F2 Dining Area"] = "二楼餐区",
+    ["Scullery"] = "洗涤间",
+    ["Staff Room"] = "员工房",
+    ["Coffee Bar"] = "咖啡吧",
+    ["Restroom 2"] = "洗手间2",
+    ["Restroom 1"] = "洗手间1",
+    ["Meeting Room 2"] = "会议室2",
+    ["Meeting Room 1"] = "会议室1",
+    ["F1 Dining Area"] = "一楼餐区",
+    ["Alley"] = "小巷",
+    ["Lounge"] = "休息室",
     ["Staff Bathroom"] = "员工浴室",
     ["F2 Hallway"] = "二楼走廊",
-    ["Closet Room"] = "储藏衣帽间",
+    ["Closet Room"] = "壁橱房",
     ["F1 Hallway"] = "一楼走廊",
-    ["Stairs"] = "楼梯间",
+    ["Stairs"] = "楼梯",
     ["Laundry"] = "洗衣房",
-    ["Cell Block A"] = "A监区",
-    ["Block A Guard Room F1"] = "A监区一楼看守室",
-    ["Block B Hallway"] = "B监区走廊",
-    ["Block A Checkpoint"] = "A监区安检检查站",
+    ["Cell Block A"] = "A区牢房",
+    ["Block A Guard Room F1"] = "A区一楼警卫室",
+    ["Block B Hallway"] = "B区走廊",
+    ["Block A Checkpoint"] = "A区检查站",
     ["Classroom"] = "教室",
-    ["Block A Hallway"] = "A监区走廊",
-    ["Program Room"] = "活动活动室",
-    ["Showers"] = "淋浴间",
-    ["Block A Stairwell"] = "A监区楼梯井",
-    ["Services Hallway"] = "后勤通道",
-    ["Mail Room"] = "邮件收发室",
-    ["Cell Block B"] = "B监区",
-    ["Block B Checkpoint"] = "B监区安检检查站",
+    ["Block A Hallway"] = "A区走廊",
+    ["Program Room"] = "活动室",
+    ["Showers"] = "淋浴室",
+    ["Block A Stairwell"] = "A区楼梯间",
+    ["Services Hallway"] = "服务走廊",
+    ["Mail Room"] = "邮件室",
+    ["Cell Block B"] = "B区牢房",
+    ["Block B Checkpoint"] = "B区检查站",
     ["Cafeteria"] = "食堂",
     ["Staff Restroom"] = "员工洗手间",
-    ["Guards Office"] = "狱警办公室",
+    ["Guards Office"] = "警卫办公室",
     ["Armory"] = "军械库",
     ["Infirmary"] = "医务室",
-    ["Admin Control Room"] = "行政中控室",
-    ["Workshop"] = "工坊/劳作间",
-    ["Block B Guard Room F1"] = "B监区一楼看守室",
-    ["Block B Yard"] = "B监区放风场",
-    ["Block A Guard Room F2"] = "A监区二楼看守室",
-    ["Services Control Room"] = "后勤中控室",
-    ["Services Checkpoint"] = "后勤检查站",
-    ["Utility Room"] = "设备杂物间",
-    ["Lobby"] = "大厅前厅",
-    ["Visitation Room"] = "探视会见室",
-    ["Prison Intake"] = "监狱收押登记处",
-    ["Cell A01"] = "A01监舍",
-    ["Cell A06"] = "A06监舍",
-    ["Cell A10"] = "A10监舍",
-    ["Cell A15"] = "A15监舍",
-    ["Cell A17"] = "A17监舍",
-    ["Cell A19"] = "A19监舍",
-    ["Cell A23"] = "A23监舍",
-    ["Cell B02"] = "B02监舍",
-    ["Cell B06"] = "B06监舍",
-    ["Cell B10"] = "B10监舍",
-    ["Block A Hallway F2"] = "A监区二楼走廊",
+    ["Admin Control Room"] = "行政控制室",
+    ["Workshop"] = "工坊",
+    ["Block B Guard Room F1"] = "B区一楼警卫室",
+    ["Block B Yard"] = "B区庭院",
+    ["Block A Guard Room F2"] = "A区二楼警卫室",
+    ["Services Control Room"] = "服务控制室",
+    ["Services Checkpoint"] = "服务检查站",
+    ["Utility Room"] = "设备间",
+    ["Lobby"] = "大厅",
+    ["Visitation Room"] = "探视室",
+    ["Prison Intake"] = "监狱接收处",
+    ["Cell A01"] = "A01牢房",
+    ["Cell A06"] = "A06牢房",
+    ["Cell A10"] = "A10牢房",
+    ["Cell A15"] = "A15牢房",
+    ["Cell A17"] = "A17牢房",
+    ["Cell A19"] = "A19牢房",
+    ["Cell A23"] = "A23牢房",
+    ["Cell B02"] = "B02牢房",
+    ["Cell B06"] = "B06牢房",
+    ["Cell B10"] = "B10牢房",
+    ["Block A Hallway F2"] = "A区二楼走廊",
     ["Holding Cell"] = "临时拘留室",
-    ["Admin Restroom"] = "行政办公区卫生间",
-
+    ["Admin Restroom"] = "行政洗手间",
 
     ["Blacklight"] = "紫外线手电",
     ["Cross"] = "十字架",
@@ -188,6 +199,7 @@ local TranslationMap = {
 
     ["Haunted Mirror"] = "鬼镜",
     ["Music box"] = "音乐盒",
+    ["Music Box"] = "音乐盒",
     ["Magnifying Glass"] = "放大镜",
     ["Summoning Circle"] = "召唤阵",
     ["Umbra Board"] = "通灵板",
@@ -210,7 +222,7 @@ local CursedItemNames = {
     ["Summoning Circle"] = true,
 }
 
--- 通用：基础函数
+--功能所属：基础函数
 
 local function getRoot(model)
     if not model then
@@ -234,7 +246,10 @@ local function getDistance(position)
         return "无"
     end
 
-    return string.format("%dm", math.floor((root.Position - position).Magnitude))
+    return string.format(
+        "%dm",
+        math.floor((root.Position - position).Magnitude)
+    )
 end
 
 local function getAttributeAny(instance, names)
@@ -256,12 +271,18 @@ end
 local function getPlayerCurrentRoom()
     local value =
         LocalPlayer:GetAttribute("CurrentRoom")
-        or (LocalPlayer:FindFirstChild("CurrentRoom") and LocalPlayer.CurrentRoom.Value)
+        or (
+            LocalPlayer:FindFirstChild("CurrentRoom")
+            and LocalPlayer.CurrentRoom.Value
+        )
 
     if not value and LocalPlayer.Character then
         value = LocalPlayer.Character:GetAttribute("CurrentRoom")
 
-        local obj = LocalPlayer.Character:FindFirstChild("CurrentRoom", true)
+        local obj = LocalPlayer.Character:FindFirstChild(
+            "CurrentRoom",
+            true
+        )
 
         if obj and obj:IsA("ValueBase") then
             value = obj.Value
@@ -341,7 +362,31 @@ local function detectGhostOrb()
     return workspace:FindFirstChild("GhostOrb", true) ~= nil
 end
 
--- ESP：类型
+--功能所属：幽灵特殊状态
+
+local HuntingState = false
+local HuntingAttributeExists = false
+
+local BrokenGlassCount = 0
+
+local GhostCantDisableNotified = false
+local GhostHeadlessNotified = false
+
+local function getBrokenGlassCount()
+    local brokenGlass = workspace:FindFirstChild("BrokenGlass")
+
+    if not brokenGlass then
+        return 0
+    end
+
+    return #brokenGlass:GetChildren()
+end
+
+local function updateBrokenGlassCount()
+    BrokenGlassCount = getBrokenGlassCount()
+end
+
+--功能所属：ESP
 
 local ESPEnabled = {
     Ghost = false,
@@ -353,7 +398,6 @@ local ESPEnabled = {
 }
 
 local ESPStorage = {}
-
 local GhostTransparency = {}
 
 local ESPScanConnection
@@ -369,6 +413,8 @@ local ESPColors = {
     Cursed = Color3.fromRGB(255, 150, 0),
 }
 
+--功能所属：ESP高亮
+
 local function createHighlight(object, espType)
     if not object or not object:IsDescendantOf(workspace) then
         return nil
@@ -381,6 +427,7 @@ local function createHighlight(object, espType)
     end
 
     local highlight = Instance.new("Highlight")
+
     highlight.Name = "SiESPHighlight"
     highlight.FillColor = ESPColors[espType]
     highlight.FillTransparency = 0.72
@@ -424,6 +471,8 @@ local function getDisplayName(object, espType)
     return object.Name
 end
 
+--功能所属：普通ESP
+
 local function createESP(object, espType)
     if not object or not object:IsDescendantOf(workspace) then
         return
@@ -458,6 +507,7 @@ local function createESP(object, espType)
     end
 
     local billboard = Instance.new("BillboardGui")
+
     billboard.Name = "SiESPInfo"
     billboard.AlwaysOnTop = true
     billboard.Size = UDim2.new(0, 220, 0, 40)
@@ -466,6 +516,7 @@ local function createESP(object, espType)
     billboard.Parent = root
 
     local label = Instance.new("TextLabel")
+
     label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.TextColor3 = ESPColors[espType]
@@ -473,7 +524,11 @@ local function createESP(object, espType)
     label.TextStrokeTransparency = 0
     label.Font = Enum.Font.SourceSans
     label.TextSize = 14
-    label.Text = getDisplayName(object, espType) .. "\n[" .. getDistance(root.Position) .. "]"
+
+    label.Text =
+        getDisplayName(object, espType)
+        .. "\n[" .. getDistance(root.Position) .. "]"
+
     label.Parent = billboard
 
     local connection = RunService.Heartbeat:Connect(function()
@@ -500,6 +555,8 @@ local function createESP(object, espType)
     }
 end
 
+--功能所属：幽灵透明度恢复
+
 local function restoreGhostTransparency(object)
     local saved = GhostTransparency[object]
 
@@ -514,7 +571,8 @@ local function restoreGhostTransparency(object)
                     instance.Transparency = info.Transparency
                 end
 
-                if info.Material ~= nil and instance:IsA("BasePart") then
+                if info.Material ~= nil
+                    and instance:IsA("BasePart") then
                     instance.Material = info.Material
                 end
             end)
@@ -523,6 +581,8 @@ local function restoreGhostTransparency(object)
 
     GhostTransparency[object] = nil
 end
+
+--功能所属：幽灵ESP
 
 local function createGhostESP(object)
     if not object or not object:IsDescendantOf(workspace) then
@@ -546,7 +606,9 @@ local function createGhostESP(object)
                 part.Transparency = 0
                 part.Material = Enum.Material.SmoothPlastic
 
-            elseif part:IsA("Decal") or part:IsA("Texture") then
+            elseif part:IsA("Decal")
+                or part:IsA("Texture") then
+
                 GhostTransparency[object][part] = {
                     Transparency = part.Transparency,
                 }
@@ -581,6 +643,7 @@ local function createGhostESP(object)
     end
 
     local billboard = Instance.new("BillboardGui")
+
     billboard.Name = "SiGhostInfo"
     billboard.AlwaysOnTop = true
     billboard.Size = UDim2.new(0, 320, 0, 34)
@@ -589,6 +652,7 @@ local function createGhostESP(object)
     billboard.Parent = root
 
     local label = Instance.new("TextLabel")
+
     label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
     label.TextColor3 = ESPColors.Ghost
@@ -610,16 +674,34 @@ local function createGhostESP(object)
         end
 
         local room = translate(getGhostRoomName(object))
-        local age = getAttributeAny(object, {"Age", "GhostAge"}) or "未知"
-        local gender = translate(getAttributeAny(object, {"Gender", "Sex"}))
-        local orb = detectGhostOrb() and "✔" or "❌"
+
+        local age = getAttributeAny(object, {
+            "Age",
+            "GhostAge",
+        }) or "未知"
+
+        local gender = translate(getAttributeAny(object, {
+            "Gender",
+            "Sex",
+        }))
+
+        local orb =
+            detectGhostOrb()
+            and "🟩"
+            or "🟥"
+
+        local hunting =
+            object:GetAttribute("Hunting") == true
+            and "🟩"
+            or "🟥"
 
         label.Text = string.format(
-            "幽灵 | 房间:%s | 年龄:%s | 性别:%s | 球:%s | [%s]",
+            "幽灵 | 房间:%s | 年龄:%s | 性别:%s | 球:%s | 猎杀:%s | [%s]",
             room,
             age,
             gender,
             orb,
+            hunting,
             getDistance(root.Position)
         )
     end)
@@ -631,6 +713,8 @@ local function createGhostESP(object)
         connection = connection,
     }
 end
+
+--功能所属：ESP删除
 
 local function removeESP(object)
     local data = ESPStorage[object]
@@ -666,6 +750,8 @@ local function clearESPType(espType)
     end
 end
 
+--功能所属：ESP扫描
+
 local function collectObjects(espType)
     local result = {}
 
@@ -680,7 +766,9 @@ local function collectObjects(espType)
     elseif espType == "Player" then
 
         for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character then
+            if player ~= LocalPlayer
+                and player.Character then
+
                 table.insert(result, player.Character)
             end
         end
@@ -691,7 +779,9 @@ local function collectObjects(espType)
         local fuseBox = map and map:FindFirstChild("FuseBox")
 
         if fuseBox then
-            if fuseBox:IsA("Model") or fuseBox:IsA("BasePart") then
+            if fuseBox:IsA("Model")
+                or fuseBox:IsA("BasePart") then
+
                 table.insert(result, fuseBox)
             else
                 for _, child in ipairs(fuseBox:GetChildren()) do
@@ -718,7 +808,9 @@ local function collectObjects(espType)
             for _, child in ipairs(items:GetChildren()) do
                 local itemName = child:GetAttribute("ItemName")
 
-                if itemName and not CursedItemNames[itemName] then
+                if itemName
+                    and not CursedItemNames[itemName] then
+
                     table.insert(result, child)
                 end
             end
@@ -732,20 +824,26 @@ local function collectObjects(espType)
             for _, child in ipairs(items:GetChildren()) do
                 local itemName = child:GetAttribute("ItemName")
 
-                if itemName and CursedItemNames[itemName] then
+                if itemName
+                    and CursedItemNames[itemName] then
+
                     table.insert(result, child)
                 end
             end
         end
 
-        local holder = workspace:FindFirstChild("CursedPossessionHolder")
+        local holder = workspace:FindFirstChild(
+            "CursedPossessionHolder"
+        )
 
         if holder and #holder:GetChildren() > 0 then
 
             for _, child in ipairs(holder:GetChildren()) do
                 local itemName = child:GetAttribute("ItemName")
 
-                if itemName and CursedItemNames[itemName] then
+                if itemName
+                    and CursedItemNames[itemName] then
+
                     table.insert(result, child)
                 end
 
@@ -756,7 +854,10 @@ local function collectObjects(espType)
                 end
             end
 
-            local circle = holder:FindFirstChild("Summoning Circle", true)
+            local circle = holder:FindFirstChild(
+                "Summoning Circle",
+                true
+            )
 
             if circle and not table.find(result, circle) then
                 table.insert(result, circle)
@@ -776,7 +877,10 @@ local function scanESP()
         if enabled then
             local found = {}
 
-            for _, object in ipairs(collectObjects(espType)) do
+            for _, object in ipairs(
+                collectObjects(espType)
+            ) do
+
                 found[object] = true
 
                 if espType == "Ghost" then
@@ -787,7 +891,9 @@ local function scanESP()
             end
 
             for object, data in pairs(ESPStorage) do
-                if data.type == espType and not found[object] then
+                if data.type == espType
+                    and not found[object] then
+
                     removeESP(object)
                 end
             end
@@ -809,7 +915,10 @@ local function refreshHighlights()
             if object:IsDescendantOf(workspace)
                 and ESPEnabled[data.type] then
 
-                data.highlight = createHighlight(object, data.type)
+                data.highlight = createHighlight(
+                    object,
+                    data.type
+                )
             end
         end
     end
@@ -818,10 +927,14 @@ end
 ESPScanConnection = RunService.Heartbeat:Connect(scanESP)
 
 task.spawn(function()
-    while HighlightRefreshRunning and not ScriptClosed do
+    while HighlightRefreshRunning
+        and not ScriptClosed do
+
         task.wait(1)
 
-        if HighlightRefreshRunning and not ScriptClosed then
+        if HighlightRefreshRunning
+            and not ScriptClosed then
+
             refreshHighlights()
         end
     end
@@ -837,9 +950,10 @@ local function setESPType(espType, state)
     end
 end
 
--- 幽灵区：属性信息
+--功能所属：幽灵信息小窗
 
 local SideGui = Instance.new("ScreenGui")
+
 SideGui.Name = "SiSideStats"
 SideGui.ResetOnSpawn = false
 SideGui.IgnoreGuiInset = true
@@ -847,13 +961,15 @@ SideGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 SideGui.Parent = CoreGui
 
 local SideContainer = Instance.new("Frame")
+
 SideContainer.Name = "Container"
-SideContainer.Size = UDim2.new(0, 210, 0, 150)
-SideContainer.Position = UDim2.new(1, -220, 0, 10)
+SideContainer.Size = UDim2.new(0, 230, 0, 180)
+SideContainer.Position = UDim2.new(1, -240, 0, 10)
 SideContainer.BackgroundTransparency = 1
 SideContainer.Parent = SideGui
 
 local SideList = Instance.new("UIListLayout")
+
 SideList.SortOrder = Enum.SortOrder.LayoutOrder
 SideList.Padding = UDim.new(0, 2)
 SideList.HorizontalAlignment = Enum.HorizontalAlignment.Right
@@ -861,6 +977,7 @@ SideList.Parent = SideContainer
 
 local function createRoundedInfoBox(name, size, textColor)
     local background = Instance.new("Frame")
+
     background.Name = name .. "Background"
     background.Size = size
     background.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
@@ -901,17 +1018,19 @@ local function createRoundedInfoBox(name, size, textColor)
     return background, label
 end
 
-local GhostInfoBackground, GhostInfoLabel = createRoundedInfoBox(
-    "GhostInfo",
-    UDim2.new(0, 210, 0, 85),
-    ESPColors.Ghost
-)
+local GhostInfoBackground, GhostInfoLabel =
+    createRoundedInfoBox(
+        "GhostInfo",
+        UDim2.new(0, 230, 0, 125),
+        ESPColors.Ghost
+    )
 
-local PlayerInfoBackground, PlayerStatsLabel = createRoundedInfoBox(
-    "PlayerInfo",
-    UDim2.new(0, 210, 0, 70),
-    Color3.new(1, 1, 1)
-)
+local PlayerInfoBackground, PlayerStatsLabel =
+    createRoundedInfoBox(
+        "PlayerInfo",
+        UDim2.new(0, 230, 0, 70),
+        Color3.new(1, 1, 1)
+    )
 
 GhostInfoBackground.LayoutOrder = 1
 PlayerInfoBackground.LayoutOrder = 2
@@ -923,231 +1042,7 @@ local GhostInfoEnabled = false
 local MaxGhostSpeed = 0
 local GhostInfoUpdateConn
 
-local function updateMenuGhostInfo()
-    if not GhostInfoLabel or not GhostInfoEnabled or ScriptClosed then
-        return
-    end
-
-    local ghost = getGhostModel()
-
-    if not ghost then
-        GhostInfoLabel.Text =
-            "👻 幽灵信息\n"
-            .. "----------------------------------\n"
-            .. "年龄：-\n"
-            .. "当前房间：-\n"
-            .. "鬼房：-\n"
-            .. "鬼房温度：-\n"
-            .. "幽灵球：-\n"
-            .. "性别：-"
-
-        return
-    end
-
-    local root = getRoot(ghost)
-
-    local age = getAttributeAny(ghost, {
-        "Age",
-        "GhostAge",
-    }) or "-"
-
-    local gender = translate(getAttributeAny(ghost, {
-        "Gender",
-        "Sex",
-    }))
-
-    local currentRoomRaw = getAttributeAny(ghost, {
-        "CurrentRoom",
-        "Room",
-    })
-
-    local currentRoom =
-        currentRoomRaw
-        and translate(currentRoomRaw)
-        or "-"
-
-    local ghostRoomRaw = getAttributeAny(ghost, {
-        "GhostRoom",
-        "FavoriteRoom",
-    }) or currentRoomRaw
-
-    local ghostRoom =
-        ghostRoomRaw
-        and translate(ghostRoomRaw)
-        or "-"
-
-    local ghostTemp = getRoomTemperatureByName(ghostRoomRaw)
-
-    local orb = detectGhostOrb() and "✔" or "❌"
-
-    local speed = 0
-
-    if root then
-        speed = root.AssemblyLinearVelocity.Magnitude
-
-        if speed < 0.1 then
-            speed = 0
-        end
-
-        if speed > MaxGhostSpeed then
-            MaxGhostSpeed = speed
-        end
-    end
-
-    GhostInfoLabel.Text = string.format(
-        "👻 幽灵信息\n"
-        .. "----------------------------------\n"
-        .. "年龄：%s\n"
-        .. "当前房间：%s\n"
-        .. "鬼房：%s\n"
-        .. "鬼房温度：%s\n"
-        .. "幽灵球：%s\n"
-        .. "性别：%s",
-        tostring(age),
-        currentRoom,
-        ghostRoom,
-        ghostTemp and string.format("%.2f℃", ghostTemp) or "-",
-        orb,
-        gender
-    )
-end
-
-local function getRoomTemperature()
-    local roomName = getPlayerCurrentRoom()
-
-    if not roomName then
-        return 0, "无"
-    end
-
-    local temperature = getRoomTemperatureByName(roomName)
-
-    return temperature or 0, translate(roomName)
-end
-
-local function updatePlayerInfo()
-    if not GhostInfoEnabled or ScriptClosed then
-        return
-    end
-
-    local temperature, room = getRoomTemperature()
-
-    local energy = LocalPlayer:GetAttribute("Energy")
-
-    if energy == nil then
-        energy = LocalPlayer:GetAttribute("Sanity")
-    end
-
-    if energy == nil then
-        energy = 100
-    end
-
-    PlayerStatsLabel.Text = string.format(
-        "玩家信息\n房间：%s\n温度：%.2f℃\n理智：%d%%",
-        room,
-        temperature,
-        math.clamp(math.round(tonumber(energy) or 100), 0, 100)
-    )
-end
-
-GhostInfoUpdateConn = RunService.Heartbeat:Connect(function()
-    if GhostInfoEnabled and not ScriptClosed then
-        updateMenuGhostInfo()
-        updatePlayerInfo()
-    end
-end)
-
-local GroupGhost = TabGhost:AddLeftGroupbox("幽灵")
-
-GroupGhost:AddToggle("GhostStatsWindow", {
-    Text = "属性信息小窗",
-    Default = false,
-
-    Callback = function(v)
-        GhostInfoEnabled = v
-
-        GhostInfoBackground.Visible = v
-        PlayerInfoBackground.Visible = v
-    end,
-})
-
--- 幽灵区：透视
-
-local GroupESP = TabGhost:AddRightGroupbox("透视")
-
-local ESPSelectorValues = {
-    "幽灵",
-    "玩家",
-    "发电机",
-    "指纹",
-    "物品",
-    "诅咒道具",
-}
-
-local ESPNameToType = {
-    ["幽灵"] = "Ghost",
-    ["玩家"] = "Player",
-    ["发电机"] = "Generator",
-    ["指纹"] = "Fingerprint",
-    ["物品"] = "Item",
-    ["诅咒道具"] = "Cursed",
-}
-
-GroupESP:AddDropdown("ESPSelector", {
-    Values = ESPSelectorValues,
-    Default = {},
-    Multi = true,
-    Text = "透视",
-
-    Callback = function(values)
-        local selected = {}
-
-        if type(values) == "table" then
-            for _, value in ipairs(values) do
-                selected[value] = true
-            end
-
-            for value, enabled in pairs(values) do
-                if type(value) == "string" and enabled == true then
-                    selected[value] = true
-                end
-            end
-
-        elseif type(values) == "string" then
-            selected[values] = true
-        end
-
-        for displayName, espType in pairs(ESPNameToType) do
-            setESPType(
-                espType,
-                selected[displayName] == true
-            )
-        end
-    end,
-})
-
--- 证据页：证据检测
-
-local GroupEvidence = TabEvidence:AddLeftGroupbox("证据")
-
-local EvidenceState = {
-    EMF5 = false,
-    Finger = false,
-    Orb = false,
-    Temp = false,
-    Writing = false,
-    Flower = false,
-    Dots = false,
-    Box = false,
-}
-
-local LabelEMF = GroupEvidence:AddLabel("EMF5级：❌")
-local LabelFinger = GroupEvidence:AddLabel("指纹：❌")
-local LabelOrb = GroupEvidence:AddLabel("幽灵球：❌")
-local LabelTemp = GroupEvidence:AddLabel("冻结温度：❌")
-local LabelWriting = GroupEvidence:AddLabel("鬼写字：❌")
-local LabelFlower = GroupEvidence:AddLabel("花枯萎：❌")
-local LabelDots = GroupEvidence:AddLabel("幽灵点阵：❌")
-local LabelBox = GroupEvidence:AddLabel("灵魂盒子：❌")
+--功能所属：证据资料
 
 local Ghosts = {
     {
@@ -1327,6 +1222,724 @@ local Ghosts = {
     },
 }
 
+--功能所属：证据状态
+
+local EvidenceState = {
+    EMF5 = false,
+    Finger = false,
+    Orb = false,
+    Temp = false,
+    Writing = false,
+    Flower = false,
+    Dots = false,
+    Box = false,
+}
+
+local EvidenceConfirmed = {
+    EMF5 = false,
+    Finger = false,
+    Orb = false,
+    Temp = false,
+    Writing = false,
+    Flower = false,
+    Dots = false,
+    Box = false,
+}
+
+local GhostOrbInitialized = false
+
+local EvidenceNameMap = {
+    EMF5 = "EMF5",
+    Finger = "指纹",
+    Orb = "幽灵球",
+    Temp = "冻结温度",
+    Writing = "鬼写字",
+    Flower = "花枯萎",
+    Dots = "幽灵点阵",
+    Box = "灵魂盒子",
+}
+
+--功能所属：证据UI
+
+local GroupEvidence =
+    TabEvidence:AddLeftGroupbox("证据")
+
+local LabelEMF =
+    GroupEvidence:AddLabel("EMF5级：🟥")
+
+local LabelFinger =
+    GroupEvidence:AddLabel("指纹：🟥")
+
+local LabelOrb =
+    GroupEvidence:AddLabel("幽灵球：🟥")
+
+local LabelTemp =
+    GroupEvidence:AddLabel("冻结温度：🟥")
+
+local LabelWriting =
+    GroupEvidence:AddLabel("幽灵写作：🟥")
+
+local LabelFlower =
+    GroupEvidence:AddLabel("黑花：🟥")
+
+local LabelDots =
+    GroupEvidence:AddLabel("幽灵点阵：🟥")
+
+local LabelBox =
+    GroupEvidence:AddLabel("灵魂盒子：🟥")
+
+--功能所属：幽灵筛选
+
+local PossibleLabel =
+    GroupEvidence:AddLabel("幽灵：正在筛选")
+
+local function ghostHasEvidence(ghost, evidence)
+    return table.find(
+        ghost.Evidences,
+        evidence
+    ) ~= nil
+end
+
+local function isGhostPossible(ghost)
+    for stateName, evidenceName in pairs(EvidenceNameMap) do
+        if EvidenceConfirmed[stateName] then
+
+            local hasEvidence =
+                ghostHasEvidence(
+                    ghost,
+                    evidenceName
+                )
+
+            if EvidenceState[stateName]
+                and not hasEvidence then
+
+                return false
+            end
+
+            if not EvidenceState[stateName]
+                and hasEvidence then
+
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+local function getPositiveEvidenceCount()
+    local count = 0
+
+    for name in pairs(EvidenceState) do
+        if EvidenceConfirmed[name]
+            and EvidenceState[name] then
+
+            count += 1
+        end
+    end
+
+    return count
+end
+
+local refreshGhostQuery
+
+local function getPossibleGhostList()
+    local possible = {}
+
+    for _, ghost in ipairs(Ghosts) do
+        if isGhostPossible(ghost) then
+            table.insert(
+                possible,
+                ghost
+            )
+        end
+    end
+
+    return possible
+end
+
+local function updatePossibleGhosts()
+    local possible = getPossibleGhostList()
+
+    if #possible == 0 then
+        PossibleLabel:SetText(
+            "幽灵：无匹配"
+        )
+    else
+        local positiveCount =
+            getPositiveEvidenceCount()
+
+        if #possible == 1
+            and positiveCount >= 3 then
+
+            PossibleLabel:SetText(
+                "幽灵：" ..
+                possible[1].Name
+            )
+        else
+            PossibleLabel:SetText(
+                "幽灵：正在筛选"
+            )
+        end
+    end
+
+    if refreshGhostQuery then
+        pcall(refreshGhostQuery)
+    end
+
+    return possible
+end
+
+--功能所属：证据UI刷新
+
+local function updateEvidenceUI()
+
+    local function getStateText(name)
+        if not EvidenceConfirmed[name] then
+            return "❔"
+        end
+
+        return EvidenceState[name]
+            and "🟩"
+            or "🟥"
+    end
+
+    LabelEMF:SetText(
+        "EMF5级：" .. getStateText("EMF5")
+    )
+
+    LabelFinger:SetText(
+        "指纹：" .. getStateText("Finger")
+    )
+
+    LabelOrb:SetText(
+        "幽灵球：" .. getStateText("Orb")
+    )
+
+    LabelTemp:SetText(
+        "冻结温度：" .. getStateText("Temp")
+    )
+
+    LabelWriting:SetText(
+        "鬼写字：" .. getStateText("Writing")
+    )
+
+    LabelFlower:SetText(
+        "花枯萎：" .. getStateText("Flower")
+    )
+
+    LabelDots:SetText(
+        "幽灵点阵：" .. getStateText("Dots")
+    )
+
+    LabelBox:SetText(
+        "灵魂盒子：" .. getStateText("Box")
+    )
+end
+
+--功能所属：幽灵信息
+
+local function getGhostIdentificationText()
+    local possible = getPossibleGhostList()
+    local positiveCount = getPositiveEvidenceCount()
+
+    if #possible == 1
+        and positiveCount >= 3 then
+
+        return "幽灵：" .. possible[1].Name
+    end
+
+    return "幽灵：正在筛选"
+end
+
+local function updateMenuGhostInfo()
+    if not GhostInfoLabel
+        or not GhostInfoEnabled
+        or ScriptClosed then
+
+        return
+    end
+
+    local ghost = getGhostModel()
+
+    if not ghost then
+        GhostInfoLabel.Text =
+            "👻 幽灵信息\n"
+            .. "----------------------------------\n"
+            .. "幽灵：正在根据证据筛选\n"
+            .. "年龄：-\n"
+            .. "当前房间：-\n"
+            .. "鬼房：-\n"
+            .. "鬼房温度：-\n"
+            .. "幽灵球：-\n"
+            .. "性别：-\n"
+            .. "猎杀中：🟥\n"
+            .. "打碎玻璃次数："
+            .. tostring(BrokenGlassCount)
+            .. "次"
+
+        return
+    end
+
+    local root = getRoot(ghost)
+
+    local age = getAttributeAny(ghost, {
+        "Age",
+        "GhostAge",
+    }) or "-"
+
+    local gender = translate(getAttributeAny(ghost, {
+        "Gender",
+        "Sex",
+    }))
+
+    local currentRoomRaw = getAttributeAny(ghost, {
+        "CurrentRoom",
+        "Room",
+    })
+
+    local currentRoom =
+        currentRoomRaw
+        and translate(currentRoomRaw)
+        or "-"
+
+    local ghostRoomRaw = getAttributeAny(ghost, {
+        "GhostRoom",
+        "FavoriteRoom",
+    }) or currentRoomRaw
+
+    local ghostRoom =
+        ghostRoomRaw
+        and translate(ghostRoomRaw)
+        or "-"
+
+    local ghostTemp =
+        getRoomTemperatureByName(ghostRoomRaw)
+
+    local orb =
+        detectGhostOrb()
+        and "🟩"
+        or "🟥"
+
+    local hunting =
+        ghost:GetAttribute("Hunting") == true
+        and "🟩"
+        or "🟥"
+
+    if root then
+        local speed =
+            root.AssemblyLinearVelocity.Magnitude
+
+        if speed < 0.1 then
+            speed = 0
+        end
+
+        if speed > MaxGhostSpeed then
+            MaxGhostSpeed = speed
+        end
+    end
+
+    GhostInfoLabel.Text = string.format(
+        "👻 幽灵信息\n"
+        .. "----------------------------------\n"
+        .. "%s\n"
+        .. "年龄：%s\n"
+        .. "当前房间：%s\n"
+        .. "鬼房：%s\n"
+        .. "鬼房温度：%s\n"
+        .. "幽灵球：%s\n"
+        .. "性别：%s\n"
+        .. "猎杀中：%s\n"
+        .. "打碎玻璃次数：%d次",
+
+        getGhostIdentificationText(),
+        tostring(age),
+        currentRoom,
+        ghostRoom,
+        ghostTemp
+            and string.format("%.2f℃", ghostTemp)
+            or "-",
+        orb,
+        gender,
+        hunting,
+        BrokenGlassCount
+    )
+end
+
+--功能所属：玩家信息
+
+local function getRoomTemperature()
+    local roomName = getPlayerCurrentRoom()
+
+    if not roomName then
+        return 0, "无"
+    end
+
+    local temperature =
+        getRoomTemperatureByName(roomName)
+
+    return temperature or 0, translate(roomName)
+end
+
+local function updatePlayerInfo()
+    if not GhostInfoEnabled or ScriptClosed then
+        return
+    end
+
+    local temperature, room =
+        getRoomTemperature()
+
+    local energy =
+        LocalPlayer:GetAttribute("Energy")
+
+    if energy == nil then
+        energy =
+            LocalPlayer:GetAttribute("Sanity")
+    end
+
+    if energy == nil then
+        energy = 100
+    end
+
+    PlayerStatsLabel.Text = string.format(
+        "玩家信息\n房间：%s\n温度：%.2f℃\n理智：%d%%",
+        room,
+        temperature,
+        math.clamp(
+            math.round(tonumber(energy) or 100),
+            0,
+            100
+        )
+    )
+end
+
+GhostInfoUpdateConn =
+    RunService.Heartbeat:Connect(function()
+
+        if GhostInfoEnabled
+            and not ScriptClosed then
+
+            updateBrokenGlassCount()
+            updateMenuGhostInfo()
+            updatePlayerInfo()
+        end
+    end)
+
+local GroupGhost =
+    TabGhost:AddLeftGroupbox("幽灵")
+
+GroupGhost:AddToggle("GhostStatsWindow", {
+    Text = "属性小窗",
+    Default = false,
+
+    Callback = function(v)
+        GhostInfoEnabled = v
+
+        GhostInfoBackground.Visible = v
+        PlayerInfoBackground.Visible = v
+    end,
+})
+
+--功能所属：猎杀监听
+
+local HuntingNotifyEnabled = false
+local HuntingConnections = {}
+local HuntingGhost
+
+local function disconnectHuntingConnections()
+    for _, connection in ipairs(HuntingConnections) do
+        pcall(function()
+            connection:Disconnect()
+        end)
+    end
+
+    table.clear(HuntingConnections)
+    HuntingGhost = nil
+    HuntingAttributeExists = false
+end
+
+local function notifyGhostSpecialAttributes(ghost)
+    if not ghost then
+        return
+    end
+
+    if ghost:GetAttribute("CantDisableElectronics") ~= nil
+        and not GhostCantDisableNotified then
+
+        GhostCantDisableNotified = true
+
+        Library:Notify(
+            "👻 幽灵是 Ghoul[恶灵]",
+            2
+        )
+    end
+
+    if ghost:GetAttribute("Headless") ~= nil
+        and not GhostHeadlessNotified then
+
+        GhostHeadlessNotified = true
+
+        Library:Notify(
+            "👻 幽灵是 Dullahan[无头骑士]",
+            2
+        )
+    end
+end
+
+local function watchGhostHunting(ghost)
+    if not ghost or not ghost:IsA("Model") then
+        return
+    end
+
+    if HuntingGhost == ghost then
+        notifyGhostSpecialAttributes(ghost)
+        return
+    end
+
+    disconnectHuntingConnections()
+
+    HuntingGhost = ghost
+
+    GhostCantDisableNotified = false
+    GhostHeadlessNotified = false
+
+    local initialHunting =
+        ghost:GetAttribute("Hunting")
+
+    HuntingAttributeExists =
+        initialHunting ~= nil
+
+    HuntingState =
+        initialHunting == true
+
+    notifyGhostSpecialAttributes(ghost)
+
+    local attributeConnection =
+        ghost.AttributeChanged:Connect(
+            function(attributeName)
+
+                if ScriptClosed then
+                    return
+                end
+
+                if attributeName == "Hunting" then
+
+                    local current =
+                        ghost:GetAttribute("Hunting")
+
+                    if not HuntingAttributeExists then
+                        HuntingAttributeExists = true
+
+                        if current == true
+                            and HuntingNotifyEnabled then
+
+                            HuntingState = true
+
+                            Library:Notify(
+                                "👻 幽灵开始猎杀",
+                                1
+                            )
+                        end
+
+                    elseif current ~= HuntingState then
+
+                        HuntingState =
+                            current == true
+
+                        if HuntingNotifyEnabled then
+
+                            if current == true then
+
+                                Library:Notify(
+                                    "开始猎杀",
+                                    1
+                                )
+
+                            elseif current == false then
+
+                                Library:Notify(
+                                    "猎杀结束",
+                                    1
+                                )
+                            end
+                        end
+                    end
+
+                elseif attributeName == "CantDisableElectronics" then
+
+                    if ghost:GetAttribute(
+                        "CantDisableElectronics"
+                    ) ~= nil then
+
+                        if not GhostCantDisableNotified then
+
+                            GhostCantDisableNotified = true
+
+                            Library:Notify(
+                                "👻 幽灵是 Ghoul[恶灵]",
+                                2
+                            )
+                        end
+                    end
+
+                elseif attributeName == "Headless" then
+
+                    if ghost:GetAttribute("Headless") ~= nil then
+
+                        if not GhostHeadlessNotified then
+
+                            GhostHeadlessNotified = true
+
+                            Library:Notify(
+                                "👻 幽灵是 Dullahan[无头骑士]",
+                                2
+                            )
+                        end
+                    end
+                end
+            end
+        )
+
+    table.insert(
+        HuntingConnections,
+        attributeConnection
+    )
+end
+
+local HuntingGhostConnection =
+    workspace.DescendantAdded:Connect(function(object)
+
+        if ScriptClosed then
+            return
+        end
+
+        if object.Name == "Ghost"
+            and object:IsA("Model") then
+
+            task.defer(function()
+
+                if not ScriptClosed then
+
+                    watchGhostHunting(object)
+
+                    if HuntingNotifyEnabled then
+                        notifyGhostSpecialAttributes(object)
+                    end
+                end
+            end)
+        end
+    end)
+
+GroupGhost:AddToggle("HuntingNotify", {
+    Text = "猎杀提示",
+    Default = false,
+
+    Callback = function(v)
+
+        HuntingNotifyEnabled = v
+
+        if not v then
+            disconnectHuntingConnections()
+            return
+        end
+
+        local ghost = getGhostModel()
+
+        if ghost then
+            watchGhostHunting(ghost)
+        end
+    end,
+})
+
+--功能所属：幽灵特殊属性监听
+
+task.spawn(function()
+
+    while not ScriptClosed do
+
+        task.wait(0.25)
+
+        local ghost = getGhostModel()
+
+        if ghost then
+
+            pcall(function()
+                notifyGhostSpecialAttributes(ghost)
+            end)
+
+            if HuntingNotifyEnabled then
+                pcall(function()
+                    watchGhostHunting(ghost)
+                end)
+            end
+        end
+    end
+end)
+
+--功能所属：幽灵透视
+
+local GroupESP =
+    TabGhost:AddRightGroupbox("透视")
+
+local ESPSelectorValues = {
+    "幽灵",
+    "玩家",
+    "发电机",
+    "指纹",
+    "物品",
+    "诅咒道具",
+}
+
+local ESPNameToType = {
+    ["幽灵"] = "Ghost",
+    ["玩家"] = "Player",
+    ["发电机"] = "Generator",
+    ["指纹"] = "Fingerprint",
+    ["物品"] = "Item",
+    ["诅咒道具"] = "Cursed",
+}
+
+GroupESP:AddDropdown("ESPSelector", {
+    Values = ESPSelectorValues,
+    Default = {},
+    Multi = true,
+    Text = "透视",
+
+    Callback = function(values)
+
+        local selected = {}
+
+        if type(values) == "table" then
+
+            for _, value in ipairs(values) do
+                selected[value] = true
+            end
+
+            for value, enabled in pairs(values) do
+                if type(value) == "string"
+                    and enabled == true then
+
+                    selected[value] = true
+                end
+            end
+
+        elseif type(values) == "string" then
+            selected[values] = true
+        end
+
+        for displayName, espType
+            in pairs(ESPNameToType) do
+
+            setESPType(
+                espType,
+                selected[displayName] == true
+            )
+        end
+    end,
+})
+
+--功能所属：EMF5检测
+
 local function checkEMF5()
     local items = workspace:FindFirstChild("Items")
 
@@ -1335,13 +1948,20 @@ local function checkEMF5()
     end
 
     for _, item in ipairs(items:GetChildren()) do
-        if item:GetAttribute("ItemName") == "EMF Reader" then
-            local indicators = item:FindFirstChild("Indicators")
-            local five = indicators and indicators:FindFirstChild("5")
+        if item:GetAttribute("ItemName")
+            == "EMF Reader" then
+
+            local indicators =
+                item:FindFirstChild("Indicators")
+
+            local five =
+                indicators
+                and indicators:FindFirstChild("5")
 
             if five
                 and five:IsA("BasePart")
                 and five.Material == Enum.Material.Neon then
+
                 return true
             end
         end
@@ -1350,15 +1970,24 @@ local function checkEMF5()
     return false
 end
 
-local function checkFingerprints()
-    local folder = workspace:FindFirstChild("Handprints")
+--功能所属：指纹检测
 
-    return folder and #folder:GetChildren() > 0 or false
+local function checkFingerprints()
+    local folder =
+        workspace:FindFirstChild("Handprints")
+
+    return folder
+        and #folder:GetChildren() > 0
+        or false
 end
+
+--功能所属：幽灵球检测
 
 local function checkGhostOrb()
     return detectGhostOrb()
 end
+
+--功能所属：冻结温度检测
 
 local function checkFreezing()
     local map = workspace:FindFirstChild("Map")
@@ -1368,10 +1997,12 @@ local function checkFreezing()
         return false
     end
 
-    local playerRoom = getPlayerCurrentRoom()
+    local playerRoom =
+        getPlayerCurrentRoom()
 
     if playerRoom then
-        local temperature = getRoomTemperatureByName(playerRoom)
+        local temperature =
+            getRoomTemperatureByName(playerRoom)
 
         if temperature and temperature < 0 then
             return true
@@ -1379,15 +2010,20 @@ local function checkFreezing()
     end
 
     for _, room in ipairs(rooms:GetChildren()) do
-        local temperature = room:GetAttribute("Temperature")
+        local temperature =
+            room:GetAttribute("Temperature")
 
-        if typeof(temperature) == "number" and temperature < 0 then
+        if typeof(temperature) == "number"
+            and temperature < 0 then
+
             return true
         end
     end
 
     return false
 end
+
+--功能所属：点阵检测
 
 local function checkDots()
     local ghost = getGhostModel()
@@ -1396,21 +2032,29 @@ local function checkDots()
         return false
     end
 
-    return ghost:GetAttribute("InLaser") ~= nil
-        or ghost:GetAttribute("LaserVisible") ~= nil
+    return ghost:GetAttribute("LaserVisible") == true
 end
+
+--功能所属：幽灵写作检测
 
 local function checkGhostWriting()
-    local items = workspace:FindFirstChild("Items")
+    local items =
+        workspace:FindFirstChild("Items")
 
     if not items then
         return false
     end
 
     for _, item in ipairs(items:GetChildren()) do
-        if item:GetAttribute("ItemName") == "Spirit Book" then
-            if item:GetAttribute("PhotoRewardType") == "Inscription"
-                or item:GetAttribute("Disabled") == true then
+        if item:GetAttribute("ItemName")
+            == "Spirit Book" then
+
+            if item:GetAttribute("PhotoRewardType")
+                == "Inscription"
+
+                or item:GetAttribute("Disabled")
+                == true then
+
                 return true
             end
         end
@@ -1418,18 +2062,27 @@ local function checkGhostWriting()
 
     return false
 end
+
+--功能所属：黑花检测
 
 local function checkWitheredFlower()
-    local items = workspace:FindFirstChild("Items")
+    local items =
+        workspace:FindFirstChild("Items")
 
     if not items then
         return false
     end
 
     for _, item in ipairs(items:GetChildren()) do
-        if item:GetAttribute("ItemName") == "Flower Pot" then
-            if item:GetAttribute("PhotoRewardType") == "WitheredFlowers"
-                or item:GetAttribute("Disabled") == true then
+        if item:GetAttribute("ItemName")
+            == "Flower Pot" then
+
+            if item:GetAttribute("PhotoRewardType")
+                == "WitheredFlowers"
+
+                or item:GetAttribute("Disabled")
+                == true then
+
                 return true
             end
         end
@@ -1438,18 +2091,24 @@ local function checkWitheredFlower()
     return false
 end
 
+--功能所属：灵魂盒检测
+
 local function checkSpiritBox()
-    local items = workspace:FindFirstChild("Items")
+    local items =
+        workspace:FindFirstChild("Items")
 
     if not items then
         return false
     end
 
     for _, item in ipairs(items:GetChildren()) do
-        if item:GetAttribute("ItemName") == "Spirit Box" then
+        if item:GetAttribute("ItemName")
+            == "Spirit Box" then
+
             if item:GetAttribute("Response")
                 or item:GetAttribute("Answered")
                 or item:GetAttribute("GhostResponse") then
+
                 return true
             end
         end
@@ -1458,215 +2117,772 @@ local function checkSpiritBox()
     return false
 end
 
-local function updateEvidenceUI()
-    LabelEMF:SetText("EMF5级：" .. (EvidenceState.EMF5 and "✔️" or "❌"))
-    LabelFinger:SetText("指纹：" .. (EvidenceState.Finger and "✔️" or "❌"))
-    LabelOrb:SetText("幽灵球：" .. (EvidenceState.Orb and "✔️" or "❌"))
-    LabelTemp:SetText("冻结温度：" .. (EvidenceState.Temp and "✔️" or "❌"))
-    LabelWriting:SetText("鬼写字：" .. (EvidenceState.Writing and "✔️" or "❌"))
-    LabelFlower:SetText("花枯萎：" .. (EvidenceState.Flower and "✔️" or "❌"))
-    LabelDots:SetText("幽灵点阵：" .. (EvidenceState.Dots and "✔️" or "❌"))
-    LabelBox:SetText("灵魂盒子：" .. (EvidenceState.Box and "✔️" or "❌"))
-end
+--功能所属：幽灵球初始化
 
-local PossibleLabel = GroupEvidence:AddLabel("幽灵：筛选中")
+local function initializeGhostOrb()
 
-local function updatePossibleGhosts()
-    local count = 0
-    local last
-
-    for _, ghost in ipairs(Ghosts) do
-        local match = true
-
-        if EvidenceState.EMF5
-            and not table.find(ghost.Evidences, "EMF5") then
-            match = false
-        end
-
-        if EvidenceState.Finger
-            and not table.find(ghost.Evidences, "指纹") then
-            match = false
-        end
-
-        if EvidenceState.Orb
-            and not table.find(ghost.Evidences, "幽灵球") then
-            match = false
-        end
-
-        if EvidenceState.Temp
-            and not table.find(ghost.Evidences, "冻结温度") then
-            match = false
-        end
-
-        if EvidenceState.Writing
-            and not table.find(ghost.Evidences, "鬼写字") then
-            match = false
-        end
-
-        if EvidenceState.Flower
-            and not table.find(ghost.Evidences, "花枯萎") then
-            match = false
-        end
-
-        if EvidenceState.Dots
-            and not table.find(ghost.Evidences, "幽灵点阵") then
-            match = false
-        end
-
-        if EvidenceState.Box
-            and not table.find(ghost.Evidences, "灵魂盒子") then
-            match = false
-        end
-
-        if match then
-            count = count + 1
-            last = ghost
-        end
+    if GhostOrbInitialized then
+        return
     end
 
-    if count == 1 and last then
-        PossibleLabel:SetText(
-            "幽灵：" .. last.Name .. last.PosStr
+    local orbExists =
+        checkGhostOrb()
+
+    GhostOrbInitialized = true
+
+    EvidenceConfirmed.Orb = true
+    EvidenceState.Orb = orbExists
+
+    if orbExists then
+        Library:Notify(
+            "幽灵球",
+            1
         )
     else
-        PossibleLabel:SetText(
-            "幽灵：筛选中 (" .. count .. "个)"
+        Library:Notify(
+            "幽灵球：🟥",
+            1
         )
     end
+
+    updateEvidenceUI()
+    updatePossibleGhosts()
+end
+
+--功能所属：点阵监听
+
+local DotsConnection
+local WatchedDotsGhost
+
+local function disconnectDotsConnection()
+    if DotsConnection then
+        pcall(function()
+            DotsConnection:Disconnect()
+        end)
+
+        DotsConnection = nil
+    end
+
+    WatchedDotsGhost = nil
+end
+
+local function watchGhostDots(ghost)
+
+    if not ghost
+        or not ghost:IsA("Model") then
+        return
+    end
+
+    if WatchedDotsGhost == ghost then
+        return
+    end
+
+    disconnectDotsConnection()
+
+    WatchedDotsGhost = ghost
+
+    local initialVisible =
+        ghost:GetAttribute("LaserVisible")
+
+    if initialVisible == true then
+
+        if not EvidenceState.Dots then
+
+            EvidenceState.Dots = true
+            EvidenceConfirmed.Dots = true
+
+            Library:Notify(
+                "幽灵点阵",
+                1
+            )
+
+            updateEvidenceUI()
+            updatePossibleGhosts()
+        end
+    end
+
+    DotsConnection =
+        ghost.AttributeChanged:Connect(
+            function(attributeName)
+
+                if ScriptClosed then
+                    return
+                end
+
+                if attributeName ~= "LaserVisible" then
+                    return
+                end
+
+                local visible =
+                    ghost:GetAttribute(
+                        "LaserVisible"
+                    )
+
+                if visible == true
+                    and not EvidenceState.Dots then
+
+                    EvidenceState.Dots = true
+                    EvidenceConfirmed.Dots = true
+
+                    Library:Notify(
+                        "幽灵点阵",
+                        1
+                    )
+
+                    updateEvidenceUI()
+                    updatePossibleGhosts()
+                end
+            end
+        )
+end
+
+local GhostDotsWatcher =
+    workspace.DescendantAdded:Connect(function(object)
+
+        if ScriptClosed then
+            return
+        end
+
+        if object.Name == "Ghost"
+            and object:IsA("Model") then
+
+            task.defer(function()
+
+                if not ScriptClosed then
+
+                    watchGhostDots(object)
+
+                    if not GhostOrbInitialized then
+                        initializeGhostOrb()
+                    end
+                end
+            end)
+        end
+    end)
+
+--功能所属：灵魂盒字幕监听
+
+local SpiritBoxSubtitleConnection
+local SpiritBoxLastSubtitleText = nil
+
+local function markSpiritBoxEvidence()
+    if ScriptClosed then
+        return
+    end
+
+    if EvidenceState.Box
+        and EvidenceConfirmed.Box then
+
+        updateEvidenceUI()
+        return
+    end
+
+    EvidenceState.Box = true
+    EvidenceConfirmed.Box = true
+
+    Library:Notify(
+        "灵魂盒子",
+        1
+    )
+
+    updateEvidenceUI()
+    updatePossibleGhosts()
+end
+
+local function setupSpiritBoxSubtitleListener()
+
+    if SpiritBoxSubtitleConnection then
+        pcall(function()
+            SpiritBoxSubtitleConnection:Disconnect()
+        end)
+
+        SpiritBoxSubtitleConnection = nil
+    end
+
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+
+    if not playerGui then
+        return
+    end
+
+    local subtitles =
+        playerGui:FindFirstChild("Subtitles")
+
+    local holder =
+        subtitles
+        and subtitles:FindFirstChild("Holder")
+
+    local textLabel =
+        holder
+        and holder:FindFirstChild("TextLabel")
+
+    if not textLabel
+        or not textLabel:IsA("TextLabel") then
+
+        return
+    end
+
+    SpiritBoxLastSubtitleText = textLabel.Text
+
+    SpiritBoxSubtitleConnection =
+        textLabel:GetPropertyChangedSignal("Text"):Connect(
+            function()
+
+                if ScriptClosed then
+                    return
+                end
+
+                local newText = textLabel.Text
+
+                if newText == SpiritBoxLastSubtitleText then
+                    return
+                end
+
+                SpiritBoxLastSubtitleText = newText
+
+                if newText
+                    and tostring(newText) ~= "" then
+
+                    markSpiritBoxEvidence()
+                end
+            end
+        )
 end
 
 task.spawn(function()
-    while EvidenceLoopRunning and not ScriptClosed do
+
+    while not ScriptClosed do
+
+        local playerGui =
+            LocalPlayer:FindFirstChild("PlayerGui")
+
+        local subtitles =
+            playerGui
+            and playerGui:FindFirstChild("Subtitles")
+
+        local holder =
+            subtitles
+            and subtitles:FindFirstChild("Holder")
+
+        local textLabel =
+            holder
+            and holder:FindFirstChild("TextLabel")
+
+        if textLabel
+            and textLabel:IsA("TextLabel") then
+
+            if not SpiritBoxSubtitleConnection then
+                setupSpiritBoxSubtitleListener()
+            end
+        end
+
+        task.wait(0.5)
+    end
+end)
+
+--功能所属：启动检测
+
+task.defer(function()
+
+    task.wait(0.5)
+
+    if ScriptClosed then
+        return
+    end
+
+    initializeGhostOrb()
+
+    setupSpiritBoxSubtitleListener()
+
+    local ghost = getGhostModel()
+
+    if ghost then
+
+        watchGhostDots(ghost)
+
+        if HuntingNotifyEnabled then
+            watchGhostHunting(ghost)
+        end
+
+        notifyGhostSpecialAttributes(ghost)
+    end
+
+    updateBrokenGlassCount()
+end)
+
+--功能所属：证据循环
+
+task.spawn(function()
+
+    while EvidenceLoopRunning
+        and not ScriptClosed do
+
         task.wait(0.5)
 
-        if not EvidenceLoopRunning or ScriptClosed then
+        if not EvidenceLoopRunning
+            or ScriptClosed then
+
             break
         end
 
         pcall(function()
 
-            if not EvidenceState.EMF5 and checkEMF5() then
+            if not EvidenceState.EMF5
+                and checkEMF5() then
+
                 EvidenceState.EMF5 = true
-                Library:Notify("EMF5", 1)
+                EvidenceConfirmed.EMF5 = true
+
+                Library:Notify(
+                    "EMF5",
+                    1
+                )
             end
 
-            if not EvidenceState.Finger and checkFingerprints() then
+            if not EvidenceState.Finger
+                and checkFingerprints() then
+
                 EvidenceState.Finger = true
-                Library:Notify("指纹", 1)
+                EvidenceConfirmed.Finger = true
+
+                Library:Notify(
+                    "指纹",
+                    1
+                )
             end
 
-            if not EvidenceState.Orb and checkGhostOrb() then
-                EvidenceState.Orb = true
-                Library:Notify("幽灵球", 1)
+            if not GhostOrbInitialized then
+                initializeGhostOrb()
             end
 
-            if not EvidenceState.Temp and checkFreezing() then
+            if not EvidenceState.Temp
+                and checkFreezing() then
+
                 EvidenceState.Temp = true
-                Library:Notify("冻结温度", 1)
+                EvidenceConfirmed.Temp = true
+
+                Library:Notify(
+                    "冻结温度",
+                    1
+                )
             end
 
-            if not EvidenceState.Writing and checkGhostWriting() then
+            if not EvidenceState.Writing
+                and checkGhostWriting() then
+
                 EvidenceState.Writing = true
-                Library:Notify("鬼写字", 1)
+                EvidenceConfirmed.Writing = true
+
+                Library:Notify(
+                    "鬼写字",
+                    1
+                )
             end
 
-            if not EvidenceState.Flower and checkWitheredFlower() then
+            if not EvidenceState.Flower
+                and checkWitheredFlower() then
+
                 EvidenceState.Flower = true
-                Library:Notify("花枯萎", 1)
+                EvidenceConfirmed.Flower = true
+
+                Library:Notify(
+                    "花枯萎",
+                    1
+                )
             end
 
-            if not EvidenceState.Dots and checkDots() then
-                EvidenceState.Dots = true
-                Library:Notify("幽灵点阵", 1)
+            local ghost = getGhostModel()
+
+            if ghost then
+
+                watchGhostDots(ghost)
+
+                if HuntingNotifyEnabled then
+                    watchGhostHunting(ghost)
+                end
+
+                notifyGhostSpecialAttributes(ghost)
             end
 
-            if not EvidenceState.Box and checkSpiritBox() then
+            if not EvidenceState.Box
+                and checkSpiritBox() then
+
                 EvidenceState.Box = true
-                Library:Notify("灵魂盒子", 1)
+                EvidenceConfirmed.Box = true
+
+                Library:Notify(
+                    "灵魂盒子",
+                    1
+                )
             end
 
+            updateBrokenGlassCount()
             updateEvidenceUI()
             updatePossibleGhosts()
         end)
     end
 end)
 
--- 证据页：幽灵检索
+--功能所属：玻璃监听
 
-local GroupGhostQuery = TabEvidence:AddRightGroupbox("幽灵检索")
+local BrokenGlassConnection =
+    workspace.ChildAdded:Connect(function(child)
+
+        if ScriptClosed then
+            return
+        end
+
+        if child.Name == "BrokenGlass" then
+
+            task.defer(function()
+
+                updateBrokenGlassCount()
+
+                if GhostInfoEnabled then
+                    updateMenuGhostInfo()
+                end
+            end)
+        end
+    end)
+
+local BrokenGlassObjectConnection
+
+task.defer(function()
+
+    local brokenGlass =
+        workspace:FindFirstChild("BrokenGlass")
+
+    if brokenGlass then
+
+        BrokenGlassObjectConnection =
+            brokenGlass.ChildAdded:Connect(
+                function()
+
+                    if ScriptClosed then
+                        return
+                    end
+
+                    BrokenGlassCount =
+                        #brokenGlass:GetChildren()
+
+                    if GhostInfoEnabled then
+                        updateMenuGhostInfo()
+                    end
+                end
+            )
+    end
+end)
+
+--功能所属：幽灵检索
+
+local GroupGhostQuery =
+    TabEvidence:AddRightGroupbox("幽灵检索")
 
 local GhostDropdownList = {}
 local GhostDataMap = {}
 
-for _, ghost in ipairs(Ghosts) do
-    local display = string.format(
-        "%s [%s]",
-        ghost.Name,
-        ghost.CNName
-    )
+local QueryEvidence =
+    GroupGhostQuery:AddLabel("证据：请选择幽灵")
 
-    table.insert(GhostDropdownList, display)
-    GhostDataMap[display] = ghost
-end
+local QueryFeatures =
+    GroupGhostQuery:AddLabel("特征：请选择幽灵")
 
-local QueryEvidence = GroupGhostQuery:AddLabel("证据：")
-local QueryFeatures = GroupGhostQuery:AddLabel("特征：")
+local QueryState =
+    GroupGhostQuery:AddLabel("状态：正在筛选")
+
+local GhostSelector
+
+local GhostSelectorPlaceholder = "请选择幽灵"
+
+--功能所属：幽灵检索选择状态
+
+local SelectedGhostDisplay = nil
+local UpdatingGhostSelector = false
+local LastGhostDropdownSignature = nil
+
+--功能所属：幽灵检索辅助
 
 local function formatEvidenceList(list)
     local result = {}
 
     for _, evidence in ipairs(list) do
-        table.insert(result, "[" .. evidence .. "]")
+        table.insert(
+            result,
+            "[" .. evidence .. "]"
+        )
     end
 
-    return table.concat(result, "")
+    return table.concat(
+        result,
+        ""
+    )
 end
 
-GroupGhostQuery:AddDropdown("GhostSelector", {
-    Values = GhostDropdownList,
-    Default = 1,
-    Multi = false,
-    Text = "选择幽灵",
+local function getGhostDisplay(ghost)
+    return string.format(
+        "%s [%s]",
+        ghost.Name,
+        ghost.CNName
+    )
+end
 
-    Callback = function(value)
-        local ghost = GhostDataMap[value]
+local function ghostListContains(list, value)
+    if not value then
+        return false
+    end
 
-        if ghost then
-            QueryEvidence:SetText(
-                "证据：" .. formatEvidenceList(ghost.Evidences)
-            )
-
-            QueryFeatures:SetText(
-                "特征：\n" .. ghost.Features
-            )
+    for _, item in ipairs(list) do
+        if item == value then
+            return true
         end
-    end,
-})
+    end
 
--- 物品页：物品管理
+    return false
+end
 
-local GroupItems = TabItems:AddLeftGroupbox("物品")
+local function getGhostDropdownSignature(list)
+    return table.concat(
+        list,
+        "\31"
+    )
+end
+
+--功能所属：幽灵检索刷新
+
+refreshGhostQuery = function()
+
+    GhostDropdownList = {
+        GhostSelectorPlaceholder
+    }
+
+    GhostDataMap = {}
+
+    local possible = getPossibleGhostList()
+
+    for _, ghost in ipairs(possible) do
+
+        local display =
+            getGhostDisplay(ghost)
+
+        table.insert(
+            GhostDropdownList,
+            display
+        )
+
+        GhostDataMap[display] =
+            ghost
+    end
+
+    local newSignature =
+        getGhostDropdownSignature(
+            GhostDropdownList
+        )
+
+    -- 只有列表真的改变时才调用 SetValues
+    -- 避免每 0.5 秒重置一次选择器
+    if GhostSelector
+        and newSignature ~= LastGhostDropdownSignature then
+
+        local oldSelected =
+            SelectedGhostDisplay
+
+        local oldStillExists =
+            ghostListContains(
+                GhostDropdownList,
+                oldSelected
+            )
+
+        LastGhostDropdownSignature =
+            newSignature
+
+        UpdatingGhostSelector = true
+
+        pcall(function()
+            GhostSelector:SetValues(
+                GhostDropdownList
+            )
+        end)
+
+        if oldStillExists then
+
+            pcall(function()
+                GhostSelector:SetValue(
+                    oldSelected
+                )
+            end)
+
+        else
+
+            pcall(function()
+                GhostSelector:SetValue(
+                    GhostSelectorPlaceholder
+                )
+            end)
+
+            SelectedGhostDisplay = nil
+        end
+
+        UpdatingGhostSelector = false
+    end
+
+    local positiveCount =
+        getPositiveEvidenceCount()
+
+    if #possible == 0 then
+
+        QueryState:SetText(
+            "状态：无符合条件的幽灵"
+        )
+
+        QueryEvidence:SetText(
+            "证据：无"
+        )
+
+        QueryFeatures:SetText(
+            "特征：无"
+        )
+
+        return
+    end
+
+    if #possible == 1
+        and positiveCount >= 3 then
+
+        QueryState:SetText(
+            "状态：已锁定 " ..
+            possible[1].Name
+        )
+
+    else
+
+        QueryState:SetText(
+            "状态：正在筛选"
+        )
+    end
+
+    -- 不自动显示第一只幽灵
+    -- 只有用户手动选择后才显示资料
+    if not SelectedGhostDisplay
+        or not GhostDataMap[SelectedGhostDisplay] then
+
+        QueryEvidence:SetText(
+            "证据：请选择幽灵"
+        )
+
+        QueryFeatures:SetText(
+            "特征：请选择幽灵"
+        )
+    end
+end
+
+--功能所属：幽灵检索选择器
+
+GhostSelector =
+    GroupGhostQuery:AddDropdown(
+        "GhostSelector",
+        {
+            Values = {
+                GhostSelectorPlaceholder
+            },
+
+            Default = GhostSelectorPlaceholder,
+            Multi = false,
+            Text = "选择幽灵",
+
+            Callback = function(value)
+
+                -- SetValues / SetValue 内部刷新时
+                -- 不允许覆盖用户保存的选择
+                if UpdatingGhostSelector then
+                    return
+                end
+
+                if value == GhostSelectorPlaceholder
+                    or not value then
+
+                    SelectedGhostDisplay = nil
+
+                    QueryEvidence:SetText(
+                        "证据：请选择幽灵"
+                    )
+
+                    QueryFeatures:SetText(
+                        "特征：请选择幽灵"
+                    )
+
+                    return
+                end
+
+                local ghost =
+                    GhostDataMap[value]
+
+                if not ghost then
+                    return
+                end
+
+                -- 只有玩家真正手动选择时才保存
+                SelectedGhostDisplay = value
+
+                QueryEvidence:SetText(
+                    "证据：" ..
+                    formatEvidenceList(
+                        ghost.Evidences
+                    )
+                )
+
+                QueryFeatures:SetText(
+                    "特征：\n" ..
+                    ghost.Features
+                )
+            end,
+        }
+    )
+
+--功能所属：幽灵检索初始化
+
+LastGhostDropdownSignature = nil
+SelectedGhostDisplay = nil
+
+refreshGhostQuery()
+
+--功能所属：物品
+
+local GroupItems =
+    TabItems:AddLeftGroupbox("物品")
 
 local ItemOptionsList = {}
 local ItemDataMap = {}
 local SelectedItemString
 
 local function refreshItemsList()
+
     ItemOptionsList = {}
     ItemDataMap = {}
 
-    local items = workspace:FindFirstChild("Items")
+    local items =
+        workspace:FindFirstChild("Items")
 
     if items then
+
         local duplicate = {}
 
-        for _, item in ipairs(items:GetChildren()) do
-            local itemName = item:GetAttribute("ItemName")
+        for _, item in ipairs(
+            items:GetChildren()
+        ) do
 
-            if itemName and not CursedItemNames[itemName] then
-                local name = translate(itemName)
+            local itemName =
+                item:GetAttribute(
+                    "ItemName"
+                )
 
-                duplicate[name] = duplicate[name] or {}
+            if itemName
+                and not CursedItemNames[itemName] then
+
+                local name =
+                    translate(itemName)
+
+                duplicate[name] =
+                    duplicate[name] or {}
 
                 table.insert(
                     duplicate[name],
@@ -1675,7 +2891,9 @@ local function refreshItemsList()
             end
         end
 
-        for name, list in pairs(duplicate) do
+        for name, list
+            in pairs(duplicate) do
+
             if #list == 1 then
 
                 table.insert(
@@ -1683,57 +2901,71 @@ local function refreshItemsList()
                     name
                 )
 
-                ItemDataMap[name] = list[1]
+                ItemDataMap[name] =
+                    list[1]
 
             else
 
-                for index, item in ipairs(list) do
-                    local key = string.format(
-                        "%s[%d]",
-                        name,
-                        index
-                    )
+                for index, item
+                    in ipairs(list) do
+
+                    local key =
+                        string.format(
+                            "%s[%d]",
+                            name,
+                            index
+                        )
 
                     table.insert(
                         ItemOptionsList,
                         key
                     )
 
-                    ItemDataMap[key] = item
+                    ItemDataMap[key] =
+                        item
                 end
             end
         end
     end
 
     if #ItemOptionsList == 0 then
+
         table.insert(
             ItemOptionsList,
             "无物品"
         )
     end
 
-    table.sort(ItemOptionsList)
+    table.sort(
+        ItemOptionsList
+    )
 
-    SelectedItemString = ItemOptionsList[1]
+    SelectedItemString =
+        ItemOptionsList[1]
 end
 
 refreshItemsList()
 
-local ItemDropdown = GroupItems:AddDropdown("ItemSelector", {
-    Values = ItemOptionsList,
-    Default = 1,
-    Multi = false,
-    Text = "选择物品",
+local ItemDropdown =
+    GroupItems:AddDropdown(
+        "ItemSelector",
+        {
+            Values = ItemOptionsList,
+            Default = 1,
+            Multi = false,
+            Text = "选择物品",
 
-    Callback = function(v)
-        SelectedItemString = v
-    end,
-})
+            Callback = function(v)
+                SelectedItemString = v
+            end,
+        }
+    )
 
 GroupItems:AddButton({
     Text = "刷新物品",
 
     Func = function()
+
         refreshItemsList()
 
         ItemDropdown:SetValues(
@@ -1746,7 +2978,10 @@ GroupItems:AddButton({
     end,
 })
 
+--功能所属：物品取消锚定
+
 local function unanchorItem(item)
+
     if not item then
         return
     end
@@ -1755,7 +2990,10 @@ local function unanchorItem(item)
         item.Anchored = false
     end
 
-    for _, child in ipairs(item:GetDescendants()) do
+    for _, child in ipairs(
+        item:GetDescendants()
+    ) do
+
         if child:IsA("BasePart") then
             child.Anchored = false
         end
@@ -1766,15 +3004,31 @@ GroupItems:AddButton({
     Text = "物品到幽灵",
 
     Func = function()
-        local item = ItemDataMap[SelectedItemString]
-        local ghost = getGhostModel()
-        local root = ghost and getRoot(ghost)
+
+        local item =
+            ItemDataMap[
+                SelectedItemString
+            ]
+
+        local ghost =
+            getGhostModel()
+
+        local root =
+            ghost
+            and getRoot(ghost)
 
         if item and root then
+
             if item:IsA("Model") then
-                item:PivotTo(root.CFrame)
+
+                item:PivotTo(
+                    root.CFrame
+                )
+
             elseif item:IsA("BasePart") then
-                item.CFrame = root.CFrame
+
+                item.CFrame =
+                    root.CFrame
             end
 
             unanchorItem(item)
@@ -1786,7 +3040,11 @@ GroupItems:AddButton({
     Text = "物品到身边",
 
     Func = function()
-        local item = ItemDataMap[SelectedItemString]
+
+        local item =
+            ItemDataMap[
+                SelectedItemString
+            ]
 
         local root =
             LocalPlayer.Character
@@ -1795,11 +3053,21 @@ GroupItems:AddButton({
             )
 
         if item and root then
-            local cf = root.CFrame * CFrame.new(0, 0, -3)
+
+            local cf =
+                root.CFrame
+                * CFrame.new(
+                    0,
+                    0,
+                    -3
+                )
 
             if item:IsA("Model") then
+
                 item:PivotTo(cf)
+
             elseif item:IsA("BasePart") then
+
                 item.CFrame = cf
             end
 
@@ -1808,9 +3076,10 @@ GroupItems:AddButton({
     end,
 })
 
--- 玩家页：玩家功能
+--功能所属：玩家
 
-local GroupPlayer = TabPlayer:AddLeftGroupbox("玩家")
+local GroupPlayer =
+    TabPlayer:AddLeftGroupbox("玩家")
 
 local NoclipEnabled = false
 local NoclipConnection
@@ -1826,193 +3095,266 @@ local OriginalAmbient
 local OriginalOutdoorAmbient
 local OriginalGlobalShadows
 
-GroupPlayer:AddToggle("InfiniteStamina", {
-    Text = "无限体力",
-    Default = false,
+GroupPlayer:AddToggle(
+    "InfiniteStamina",
+    {
+        Text = "无限体力",
+        Default = false,
 
-    Callback = function(v)
-        InfiniteStaminaEnabled = v
+        Callback = function(v)
 
-        if StaminaLoopConn then
-            StaminaLoopConn:Disconnect()
-            StaminaLoopConn = nil
-        end
+            InfiniteStaminaEnabled = v
 
-        if v then
-            StaminaLoopConn = RunService.Heartbeat:Connect(function()
-                if ScriptClosed then
-                    return
-                end
+            if StaminaLoopConn then
+                StaminaLoopConn:Disconnect()
+                StaminaLoopConn = nil
+            end
 
-                pcall(function()
+            if v then
 
-                    if LocalPlayer:GetAttribute("Stamina") ~= nil then
-                        LocalPlayer:SetAttribute(
-                            "Stamina",
-                            100
-                        )
-                    end
+                StaminaLoopConn =
+                    RunService.Heartbeat:Connect(
+                        function()
 
-                    local value =
-                        LocalPlayer:FindFirstChild("Stamina")
+                            if ScriptClosed then
+                                return
+                            end
 
-                    if value and value:IsA("ValueBase") then
-                        value.Value = 100
-                    end
+                            pcall(function()
 
-                    if LocalPlayer.Character then
+                                if LocalPlayer:GetAttribute(
+                                    "Stamina"
+                                ) ~= nil then
 
-                        if LocalPlayer.Character:GetAttribute("Stamina") ~= nil then
-                            LocalPlayer.Character:SetAttribute(
-                                "Stamina",
-                                100
-                            )
+                                    LocalPlayer:SetAttribute(
+                                        "Stamina",
+                                        100
+                                    )
+                                end
+
+                                local value =
+                                    LocalPlayer:FindFirstChild(
+                                        "Stamina"
+                                    )
+
+                                if value
+                                    and value:IsA(
+                                        "ValueBase"
+                                    ) then
+
+                                    value.Value = 100
+                                end
+
+                                if LocalPlayer.Character then
+
+                                    if LocalPlayer.Character:GetAttribute(
+                                        "Stamina"
+                                    ) ~= nil then
+
+                                        LocalPlayer.Character:SetAttribute(
+                                            "Stamina",
+                                            100
+                                        )
+                                    end
+
+                                    local characterValue =
+                                        LocalPlayer.Character:FindFirstChild(
+                                            "Stamina",
+                                            true
+                                        )
+
+                                    if characterValue
+                                        and characterValue:IsA(
+                                            "ValueBase"
+                                        ) then
+
+                                        characterValue.Value =
+                                            100
+                                    end
+                                end
+                            end)
                         end
+                    )
+            end
+        end,
+    }
+)
 
-                        local characterValue =
-                            LocalPlayer.Character:FindFirstChild(
-                                "Stamina",
-                                true
-                            )
+GroupPlayer:AddToggle(
+    "NoclipToggle",
+    {
+        Text = "穿墙",
+        Default = false,
 
-                        if characterValue
-                            and characterValue:IsA("ValueBase") then
+        Callback = function(v)
 
-                            characterValue.Value = 100
+            NoclipEnabled = v
+
+            if NoclipConnection then
+
+                NoclipConnection:Disconnect()
+                NoclipConnection = nil
+            end
+
+            if v then
+
+                NoclipConnection =
+                    RunService.Stepped:Connect(
+                        function()
+
+                            if not NoclipEnabled
+                                or ScriptClosed
+                                or not LocalPlayer.Character then
+
+                                return
+                            end
+
+                            for _, part in ipairs(
+                                LocalPlayer.Character:GetDescendants()
+                            ) do
+
+                                if part:IsA("BasePart") then
+                                    part.CanCollide = false
+                                end
+                            end
+                        end
+                    )
+
+            else
+
+                if LocalPlayer.Character then
+
+                    for _, part in ipairs(
+                        LocalPlayer.Character:GetDescendants()
+                    ) do
+
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
                         end
                     end
-                end)
-            end)
-        end
-    end,
-})
-
-GroupPlayer:AddToggle("NoclipToggle", {
-    Text = "穿墙",
-    Default = false,
-
-    Callback = function(v)
-        NoclipEnabled = v
-
-        if NoclipConnection then
-            NoclipConnection:Disconnect()
-            NoclipConnection = nil
-        end
-
-        if v then
-
-            NoclipConnection = RunService.Stepped:Connect(function()
-                if not NoclipEnabled
-                    or ScriptClosed
-                    or not LocalPlayer.Character then
-                    return
                 end
+            end
+        end,
+    }
+)
 
-                for _, part in ipairs(
-                    LocalPlayer.Character:GetDescendants()
-                ) do
+GroupPlayer:AddToggle(
+    "BrightnessToggle",
+    {
+        Text = "全局明亮",
+        Default = false,
 
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
+        Callback = function(v)
+
+            BrightnessEnabled = v
+
+            if BrightnessConnection then
+
+                BrightnessConnection:Disconnect()
+                BrightnessConnection = nil
+            end
+
+            if v then
+
+                OriginalBrightness =
+                    Lighting.Brightness
+
+                OriginalAmbient =
+                    Lighting.Ambient
+
+                OriginalOutdoorAmbient =
+                    Lighting.OutdoorAmbient
+
+                OriginalGlobalShadows =
+                    Lighting.GlobalShadows
+
+                local function apply()
+
+                    if ScriptClosed then
+                        return
                     end
+
+                    Lighting.Brightness = 2
+                    Lighting.Ambient =
+                        Color3.new(1, 1, 1)
+
+                    Lighting.OutdoorAmbient =
+                        Color3.new(1, 1, 1)
+
+                    Lighting.GlobalShadows =
+                        false
+                end
+
+                apply()
+
+                BrightnessConnection =
+                    RunService.Heartbeat:Connect(
+                        apply
+                    )
+
+            else
+
+                if OriginalBrightness then
+
+                    Lighting.Brightness =
+                        OriginalBrightness
+
+                    Lighting.Ambient =
+                        OriginalAmbient
+
+                    Lighting.OutdoorAmbient =
+                        OriginalOutdoorAmbient
+
+                    Lighting.GlobalShadows =
+                        OriginalGlobalShadows
+                end
+            end
+        end,
+    }
+)
+
+GroupPlayer:AddInput(
+    "WalkSpeedInput",
+    {
+        Text = "玩家速度",
+        Default = "-1",
+        Numeric = true,
+        Finished = true,
+        Placeholder = "-1恢复",
+
+        Callback = function(value)
+
+            local speed =
+                tonumber(value)
+
+            if speed == -1
+                or not speed then
+
+                speed = 16
+            end
+
+            pcall(function()
+
+                local humanoid =
+                    LocalPlayer.Character
+                    and LocalPlayer.Character:FindFirstChild(
+                        "Humanoid"
+                    )
+
+                if humanoid then
+                    humanoid.WalkSpeed =
+                        speed
                 end
             end)
-
-        else
-
-            if LocalPlayer.Character then
-                for _, part in ipairs(
-                    LocalPlayer.Character:GetDescendants()
-                ) do
-
-                    if part:IsA("BasePart") then
-                        part.CanCollide = true
-                    end
-                end
-            end
-        end
-    end,
-})
-
-GroupPlayer:AddToggle("BrightnessToggle", {
-    Text = "全局明亮",
-    Default = false,
-
-    Callback = function(v)
-        BrightnessEnabled = v
-
-        if BrightnessConnection then
-            BrightnessConnection:Disconnect()
-            BrightnessConnection = nil
-        end
-
-        if v then
-
-            OriginalBrightness = Lighting.Brightness
-            OriginalAmbient = Lighting.Ambient
-            OriginalOutdoorAmbient = Lighting.OutdoorAmbient
-            OriginalGlobalShadows = Lighting.GlobalShadows
-
-            local function apply()
-                if ScriptClosed then
-                    return
-                end
-
-                Lighting.Brightness = 2
-                Lighting.Ambient = Color3.new(1, 1, 1)
-                Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
-                Lighting.GlobalShadows = false
-            end
-
-            apply()
-
-            BrightnessConnection =
-                RunService.Heartbeat:Connect(apply)
-
-        else
-
-            if OriginalBrightness then
-                Lighting.Brightness = OriginalBrightness
-                Lighting.Ambient = OriginalAmbient
-                Lighting.OutdoorAmbient = OriginalOutdoorAmbient
-                Lighting.GlobalShadows = OriginalGlobalShadows
-            end
-        end
-    end,
-})
-
-GroupPlayer:AddInput("WalkSpeedInput", {
-    Text = "玩家速度",
-    Default = "-1",
-    Numeric = true,
-    Finished = true,
-    Placeholder = "-1恢复",
-
-    Callback = function(value)
-        local speed = tonumber(value)
-
-        if speed == -1 or not speed then
-            speed = 16
-        end
-
-        pcall(function()
-            local humanoid =
-                LocalPlayer.Character
-                and LocalPlayer.Character:FindFirstChild(
-                    "Humanoid"
-                )
-
-            if humanoid then
-                humanoid.WalkSpeed = speed
-            end
-        end)
-    end,
-})
+        end,
+    }
+)
 
 GroupPlayer:AddButton({
     Text = "重置人物",
 
     Func = function()
+
         local humanoid =
             LocalPlayer.Character
             and LocalPlayer.Character:FindFirstChild(
@@ -2025,71 +3367,91 @@ GroupPlayer:AddButton({
     end,
 })
 
--- 玩家页：房间
+--功能所属：房间
 
-local GroupRoom = TabPlayer:AddRightGroupbox("房间")
+local GroupRoom =
+    TabPlayer:AddRightGroupbox("房间")
 
 local RoomOptionsList = {}
 local RawRoomNames = {}
 local SelectedRoom
 
 local function refreshRoomsList()
+
     RoomOptionsList = {}
     RawRoomNames = {}
 
-    local map = workspace:FindFirstChild("Map")
-    local rooms = map and map:FindFirstChild("Rooms")
+    local map =
+        workspace:FindFirstChild("Map")
+
+    local rooms =
+        map
+        and map:FindFirstChild("Rooms")
 
     if rooms then
 
-        for _, room in ipairs(rooms:GetChildren()) do
-            local display = translate(room.Name)
+        for _, room in ipairs(
+            rooms:GetChildren()
+        ) do
+
+            local display =
+                translate(room.Name)
 
             if not RawRoomNames[display] then
+
                 table.insert(
                     RoomOptionsList,
                     display
                 )
 
-                RawRoomNames[display] = room.Name
+                RawRoomNames[display] =
+                    room.Name
             end
         end
     end
 
     if #RoomOptionsList == 0 then
+
         table.insert(
             RoomOptionsList,
             "无房间"
         )
     end
 
-    SelectedRoom = RoomOptionsList[1]
+    SelectedRoom =
+        RoomOptionsList[1]
 end
 
 refreshRoomsList()
 
-local RoomDropdown = GroupRoom:AddDropdown(
-    "RoomSelector",
-    {
-        Values = RoomOptionsList,
-        Default = 1,
-        Multi = false,
-        Text = "房间",
+local RoomDropdown =
+    GroupRoom:AddDropdown(
+        "RoomSelector",
+        {
+            Values = RoomOptionsList,
+            Default = 1,
+            Multi = false,
+            Text = "房间",
 
-        Callback = function(v)
-            SelectedRoom = v
-        end,
-    }
+            Callback = function(v)
+                SelectedRoom = v
+            end,
+        }
+    )
+
+local function setPlayerCurrentRoom(
+    roomName
 )
-
-local function setPlayerCurrentRoom(roomName)
     if not roomName then
         return
     end
 
     pcall(function()
 
-        if LocalPlayer:GetAttribute("CurrentRoom") ~= nil then
+        if LocalPlayer:GetAttribute(
+            "CurrentRoom"
+        ) ~= nil then
+
             LocalPlayer:SetAttribute(
                 "CurrentRoom",
                 roomName
@@ -2097,9 +3459,13 @@ local function setPlayerCurrentRoom(roomName)
         end
 
         local value =
-            LocalPlayer:FindFirstChild("CurrentRoom")
+            LocalPlayer:FindFirstChild(
+                "CurrentRoom"
+            )
 
-        if value and value:IsA("ValueBase") then
+        if value
+            and value:IsA("ValueBase") then
+
             value.Value = roomName
         end
     end)
@@ -2108,7 +3474,10 @@ local function setPlayerCurrentRoom(roomName)
 
         pcall(function()
 
-            if LocalPlayer.Character:GetAttribute("CurrentRoom") ~= nil then
+            if LocalPlayer.Character:GetAttribute(
+                "CurrentRoom"
+            ) ~= nil then
+
                 LocalPlayer.Character:SetAttribute(
                     "CurrentRoom",
                     roomName
@@ -2121,7 +3490,9 @@ local function setPlayerCurrentRoom(roomName)
                     true
                 )
 
-            if value and value:IsA("ValueBase") then
+            if value
+                and value:IsA("ValueBase") then
+
                 value.Value = roomName
             end
         end)
@@ -2132,7 +3503,11 @@ GroupRoom:AddButton({
     Text = "更改房间",
 
     Func = function()
-        local raw = RawRoomNames[SelectedRoom]
+
+        local raw =
+            RawRoomNames[
+                SelectedRoom
+            ]
 
         if raw then
             setPlayerCurrentRoom(raw)
@@ -2144,53 +3519,63 @@ local RoomLockEnabled = false
 local RoomLockConn
 local LockedRoomRawName
 
-GroupRoom:AddToggle("LockRoomToggle", {
-    Text = "锁定房间",
-    Default = false,
+GroupRoom:AddToggle(
+    "LockRoomToggle",
+    {
+        Text = "锁定房间",
+        Default = false,
 
-    Callback = function(v)
-        RoomLockEnabled = v
+        Callback = function(v)
 
-        if RoomLockConn then
-            RoomLockConn:Disconnect()
-            RoomLockConn = nil
-        end
+            RoomLockEnabled = v
 
-        if v then
+            if RoomLockConn then
 
-            LockedRoomRawName = getPlayerCurrentRoom()
-
-            if LockedRoomRawName then
-
-                RoomLockConn =
-                    RunService.Heartbeat:Connect(function()
-
-                        if ScriptClosed then
-                            return
-                        end
-
-                        if RoomLockEnabled
-                            and LockedRoomRawName
-                            and getPlayerCurrentRoom()
-                                ~= LockedRoomRawName then
-
-                            setPlayerCurrentRoom(
-                                LockedRoomRawName
-                            )
-                        end
-                    end)
+                RoomLockConn:Disconnect()
+                RoomLockConn = nil
             end
 
-        else
-            LockedRoomRawName = nil
-        end
-    end,
-})
+            if v then
+
+                LockedRoomRawName =
+                    getPlayerCurrentRoom()
+
+                if LockedRoomRawName then
+
+                    RoomLockConn =
+                        RunService.Heartbeat:Connect(
+                            function()
+
+                                if ScriptClosed then
+                                    return
+                                end
+
+                                if RoomLockEnabled
+                                    and LockedRoomRawName
+                                    and getPlayerCurrentRoom()
+                                        ~= LockedRoomRawName then
+
+                                    setPlayerCurrentRoom(
+                                        LockedRoomRawName
+                                    )
+                                end
+                            end
+                        )
+                end
+
+            else
+
+                LockedRoomRawName = nil
+            end
+        end,
+    }
+)
 
 GroupRoom:AddButton({
     Text = "刷新房间",
 
     Func = function()
+
         refreshRoomsList()
 
         RoomDropdown:SetValues(
@@ -2203,15 +3588,20 @@ GroupRoom:AddButton({
     end,
 })
 
--- 地图页：地图
+--功能所属：地图
 
-local GroupMap = TabMap:AddLeftGroupbox("地图")
+local GroupMap =
+    TabMap:AddLeftGroupbox("地图")
 
 GroupMap:AddButton({
     Text = "删除所有门",
 
     Func = function()
-        local doors = workspace:FindFirstChild("Doors")
+
+        local doors =
+            workspace:FindFirstChild(
+                "Doors"
+            )
 
         if doors then
             doors:Destroy()
@@ -2219,11 +3609,12 @@ GroupMap:AddButton({
     end,
 })
 
--- 设置页：关闭脚本
+--功能所属：脚本关闭
 
 local cleanupScript
 
 cleanupScript = function()
+
     if ScriptClosed then
         return
     end
@@ -2233,13 +3624,50 @@ cleanupScript = function()
     HighlightRefreshRunning = false
     EvidenceLoopRunning = false
 
-    -- ESP
+    HuntingNotifyEnabled = false
+
+    disconnectHuntingConnections()
+
+    if HuntingGhostConnection then
+        pcall(function()
+            HuntingGhostConnection:Disconnect()
+        end)
+    end
+
+    disconnectDotsConnection()
+
+    if GhostDotsWatcher then
+        pcall(function()
+            GhostDotsWatcher:Disconnect()
+        end)
+    end
+
+    if SpiritBoxSubtitleConnection then
+        pcall(function()
+            SpiritBoxSubtitleConnection:Disconnect()
+        end)
+
+        SpiritBoxSubtitleConnection = nil
+    end
+
+    if BrokenGlassConnection then
+        pcall(function()
+            BrokenGlassConnection:Disconnect()
+        end)
+    end
+
+    if BrokenGlassObjectConnection then
+        pcall(function()
+            BrokenGlassObjectConnection:Disconnect()
+        end)
+    end
 
     for espType in pairs(ESPEnabled) do
         ESPEnabled[espType] = false
     end
 
     if ESPScanConnection then
+
         ESPScanConnection:Disconnect()
         ESPScanConnection = nil
     end
@@ -2252,8 +3680,6 @@ cleanupScript = function()
         restoreGhostTransparency(object)
     end
 
-    -- 幽灵信息
-
     GhostInfoEnabled = false
 
     if GhostInfoBackground then
@@ -2265,15 +3691,15 @@ cleanupScript = function()
     end
 
     if GhostInfoUpdateConn then
+
         GhostInfoUpdateConn:Disconnect()
         GhostInfoUpdateConn = nil
     end
 
-    -- 玩家功能
-
     InfiniteStaminaEnabled = false
 
     if StaminaLoopConn then
+
         StaminaLoopConn:Disconnect()
         StaminaLoopConn = nil
     end
@@ -2281,12 +3707,15 @@ cleanupScript = function()
     NoclipEnabled = false
 
     if NoclipConnection then
+
         NoclipConnection:Disconnect()
         NoclipConnection = nil
     end
 
     if LocalPlayer.Character then
+
         pcall(function()
+
             for _, part in ipairs(
                 LocalPlayer.Character:GetDescendants()
             ) do
@@ -2298,58 +3727,73 @@ cleanupScript = function()
         end)
     end
 
-    -- 亮度
-
     BrightnessEnabled = false
 
     if BrightnessConnection then
+
         BrightnessConnection:Disconnect()
         BrightnessConnection = nil
     end
 
     if OriginalBrightness ~= nil then
+
         pcall(function()
-            Lighting.Brightness = OriginalBrightness
-            Lighting.Ambient = OriginalAmbient
-            Lighting.OutdoorAmbient = OriginalOutdoorAmbient
-            Lighting.GlobalShadows = OriginalGlobalShadows
+
+            Lighting.Brightness =
+                OriginalBrightness
+
+            Lighting.Ambient =
+                OriginalAmbient
+
+            Lighting.OutdoorAmbient =
+                OriginalOutdoorAmbient
+
+            Lighting.GlobalShadows =
+                OriginalGlobalShadows
         end)
     end
-
-    -- 房间
 
     RoomLockEnabled = false
     LockedRoomRawName = nil
 
     if RoomLockConn then
+
         RoomLockConn:Disconnect()
         RoomLockConn = nil
     end
 
-    -- 小窗
-
     pcall(function()
+
         if SideGui then
             SideGui:Destroy()
         end
     end)
 
-    -- UI
-
     pcall(function()
+
         if Library.Unload then
             Library:Unload()
         end
     end)
 
-    -- 标记
+    pcall(function()
+
+        if Window then
+            Window:Destroy()
+        end
+    end)
 
     pcall(function()
-        getrenv()[ScriptRunningFlag] = nil
+        getrenv()[
+            ScriptRunningFlag
+        ] = nil
     end)
 end
 
-local GroupSettings = TabSettings:AddLeftGroupbox("脚本")
+--功能所属：设置
+
+local GroupSettings =
+    TabSettings:AddLeftGroupbox("脚本")
 
 GroupSettings:AddButton({
     Text = "关闭脚本",
@@ -2359,20 +3803,38 @@ GroupSettings:AddButton({
     end,
 })
 
--- 设置页：存档
+--功能所属：存档
 
-Library.ToggleKeybind = Library.Options.MenuKey
+Library.ToggleKeybind =
+    Library.Options.MenuKey
 
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
+ThemeManager:SetLibrary(
+    Library
+)
 
-SaveManager:BuildConfigSection(TabSettings)
+SaveManager:SetLibrary(
+    Library
+)
+
+SaveManager:BuildConfigSection(
+    TabSettings
+)
+
 SaveManager:LoadAutoloadConfig()
 
--- 脚本：窗口关闭
+--功能所属：窗口关闭
 
 pcall(function()
+
     Window:OnClose(function()
         cleanupScript()
     end)
+end)
+
+--功能所属：最终刷新
+
+pcall(function()
+    updateBrokenGlassCount()
+    updateEvidenceUI()
+    updatePossibleGhosts()
 end)
