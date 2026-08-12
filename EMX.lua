@@ -184,17 +184,12 @@ end
 --所属功能：获取幽灵速度
 local function getGhostSpeed(ghost)
     if not ghost then return nil end
-    -- 尝试Humanoid
     local humanoid = ghost:FindFirstChildWhichIsA("Humanoid")
-    if humanoid then
-        return humanoid.WalkSpeed
-    end
-    -- 尝试根部件速度
+    if humanoid then return humanoid.WalkSpeed end
     local root = getRoot(ghost)
     if root and root:IsA("BasePart") and root.Velocity then
         return root.Velocity.Magnitude
     end
-    -- 尝试属性
     local attr = getAttributeAny(ghost, {"Speed", "MoveSpeed", "WalkSpeed", "CurrentSpeed", "MovementSpeed"})
     if attr ~= nil then
         if typeof(attr) == "number" then return attr end
@@ -208,9 +203,7 @@ end
 local function getGhostMaxSpeed(ghost)
     if not ghost then return nil end
     local humanoid = ghost:FindFirstChildWhichIsA("Humanoid")
-    if humanoid and humanoid.WalkSpeed then
-        return humanoid.WalkSpeed
-    end
+    if humanoid and humanoid.WalkSpeed then return humanoid.WalkSpeed end
     local attr = getAttributeAny(ghost, {"MaxSpeed", "MaxWalkSpeed", "MaximumSpeed", "TopSpeed"})
     if attr ~= nil then
         if typeof(attr) == "number" then return attr end
@@ -779,6 +772,54 @@ local function disconnectHuntingConnections()
     HuntingGhost = nil
 end
 
+--所属功能：自动躲避猎杀
+local AutoAvoidEnabled = false
+local InitialSpawnPosition = nil
+
+-- 记录初始出生点
+task.defer(function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        InitialSpawnPosition = LocalPlayer.Character.HumanoidRootPart.Position
+    end
+end)
+
+local function getSafePosition()
+    -- 尝试SpawnLocation
+    local spawn = workspace:FindFirstChild("SpawnLocation")
+    if spawn then
+        if spawn:IsA("BasePart") then return spawn.Position end
+        if spawn:IsA("Model") then
+            local root = getRoot(spawn)
+            if root then return root.Position end
+        end
+    end
+    -- 尝试Base Camp房间
+    local map = workspace:FindFirstChild("Map")
+    local rooms = map and map:FindFirstChild("Rooms")
+    if rooms then
+        local baseCamp = rooms:FindFirstChild("Base Camp")
+        if baseCamp then
+            local root = getRoot(baseCamp)
+            if root then return root.Position end
+        end
+    end
+    -- 回退到初始出生点
+    if InitialSpawnPosition then return InitialSpawnPosition end
+    -- 最后回退
+    return Vector3.new(0, 10, 0)
+end
+
+local function teleportToSafePosition()
+    local character = LocalPlayer.Character
+    if not character then return end
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    local pos = getSafePosition()
+    if pos then
+        root.CFrame = CFrame.new(pos)
+    end
+end
+
 local function watchGhostHunting(ghost)
     if not ghost or not ghost:IsA("Model") or HuntingGhost == ghost then return end
     disconnectHuntingConnections()
@@ -787,6 +828,9 @@ local function watchGhostHunting(ghost)
         if ScriptClosed or not HuntingNotifyEnabled then return end
         if ghost:GetAttribute("Hunting") == true then
             Notify("👻 幽灵开始猎杀", 1)
+            if AutoAvoidEnabled then
+                teleportToSafePosition()
+            end
         else
             Notify("👻 猎杀结束", 1)
         end
@@ -805,6 +849,15 @@ TabGhost:Toggle({
             local ghost = getGhostModel()
             if ghost then watchGhostHunting(ghost) end
         end
+    end
+})
+
+TabGhost:Toggle({
+    Title = "自动躲避猎杀",
+    Desc = "幽灵猎杀时传送到出生点",
+    Default = false,
+    Callback = function(value)
+        AutoAvoidEnabled = value
     end
 })
 
@@ -1413,6 +1466,7 @@ cleanupScript = function()
     if ESPConnection then pcall(function() ESPConnection:Disconnect() end) ESPConnection = nil end
 
     HuntingNotifyEnabled = false
+    AutoAvoidEnabled = false
     disconnectHuntingConnections()
     disconnectDotsConnection()
 
