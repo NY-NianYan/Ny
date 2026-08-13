@@ -46,7 +46,7 @@ end
 --所属功能：主界面
 local Window = WindUI:CreateWindow({
     Title = "NY恶魔学",
-    Author = "创作者测试",
+    Author = "V0.1",
     Icon = "ghost",
     Size = UDim2.fromOffset(600, 420),
     Theme = "Dark",
@@ -267,13 +267,7 @@ local function createESP(object, espType)
     if not object or not object:IsDescendantOf(workspace) then return end
     if ESPStorage[object] then
         if ESPStorage[object].type == espType then return end
-        local old = ESPStorage[object]
-        pcall(function()
-            if old.highlight then old.highlight:Destroy() end
-            if old.billboard then old.billboard:Destroy() end
-            if old.connection then old.connection:Disconnect() end
-        end)
-        ESPStorage[object] = nil
+        removeESP(object)
     end
     local root = getRoot(object)
     if not root then return end
@@ -532,31 +526,31 @@ local GhostInfoEnabled = false
 
 --所属功能：幽灵资料
 local Ghosts = {
-    {Name = "Aswang", CNName = "阿斯旺", Evidences = {"EMF5", "鬼写字", "花枯萎"}, Features = "每击杀一次移速变快；穿过盐会减速。"},
-    {Name = "Banshee", CNName = "班希女巫", Evidences = {"冻结温度", "幽灵球", "指纹"}, Features = "更容易打碎玻璃；狩猎时会发出独特哭声。"},
-    {Name = "Demon", CNName = "恶魔", Evidences = {"EMF5", "冻结温度", "指纹"}, Features = "极其危险、频繁狩猎；十字架对它效果更强。"},
-    {Name = "Dullahan", CNName = "无头骑士", Evidences = {"冻结温度", "幽灵点阵", "花枯萎"}, Features = "照片中无头；盯着目标时间越久，移动速度越快。"},
-    {Name = "Dybbuk", CNName = "迪布布克", Evidences = {"冻结温度", "指纹", "花枯萎"}, Features = "可以投掷尸体；第一次播放音乐盒会被定住。"},
-    {Name = "Entity", CNName = "实体", Evidences = {"指纹", "幽灵点阵"}, Features = "可以传送；投掷物品前会先传送物体。"},
-    {Name = "Ghoul", CNName = "食尸鬼", Evidences = {"冻结温度", "幽灵球"}, Features = "听到人声容易发怒；无法干扰电子设备。"},
-    {Name = "Keres", CNName = "克雷斯", Evidences = {"指纹", "花枯萎"}, Features = "优先锁定能量最低的玩家；击杀玩家后自身持续减速。"},
-    {Name = "Leviathan", CNName = "巨兽利维坦", Evidences = {"鬼写字", "指纹", "幽灵球"}, Features = "非狩猎状态也能闪烁、关闭灯光设备；会淹没周边电力。"},
-    {Name = "Nightmare", CNName = "噩梦", Evidences = {"EMF5", "幽灵球"}, Features = "制造幻觉；更常在黑暗中狩猎。"},
-    {Name = "Oni", CNName = "日本恶鬼", Evidences = {"冻结温度", "幽灵点阵"}, Features = "狩猎时会冲刺；现身频率远高于其他幽灵。"},
-    {Name = "Phantom", CNName = "幻影", Evidences = {"EMF5", "指纹", "幽灵球"}, Features = "追击模式闪烁慢，隐身状态移速很快；情绪激动会变得凶猛。"},
-    {Name = "Ravager", CNName = "掠夺者", Evidences = {"EMF5", "鬼写字"}, Features = "可以同时投掷多个物品；所有互动行为都会触发EMF5。"},
-    {Name = "Revenant", CNName = "复仇者", Evidences = {"EMF5", "冻结温度", "鬼写字"}, Features = "狩猎冷却时间很短；击杀人类后会进入休息状态。"},
-    {Name = "Shadow", CNName = "阴影", Evidences = {"EMF5", "鬼写字", "幽灵点阵"}, Features = "几乎不改变室温；明亮房间里活动频率大幅降低。"},
-    {Name = "Siren", CNName = "海妖", Evidences = {"EMF5", "花枯萎"}, Features = "灵魂盒仅以女性语调回答；狩猎追逐时自身移速降低。"},
-    {Name = "Skinwalker", CNName = "皮行者", Evidences = {"冻结温度", "鬼写字"}, Features = "可以伪造幽灵球证据；能模仿其他幽灵的专属能力。"},
-    {Name = "Specter", CNName = "幽影", Evidences = {"EMF5", "冻结温度", "幽灵点阵"}, Features = "仅狩猎时会游荡，平时死守鬼房；投掷物品概率更高。"},
-    {Name = "Spirit", CNName = "灵魂", Evidences = {"鬼写字", "指纹"}, Features = "无专属强弱项；可以改变蜡烛的火焰颜色。"},
-    {Name = "Umbra", CNName = "暗影生物", Evidences = {"指纹", "幽灵球", "幽灵点阵"}, Features = "全程不会发出脚步声；光照充足的房间移动速度变慢。"},
-    {Name = "Vesper", CNName = "维斯珀", Evidences = {"鬼写字", "指纹", "花枯萎"}, Features = "仅依靠声音狩猎定位；可以穿透墙壁进行追踪。"},
-    {Name = "Vex", CNName = "维克", Evidences = {"冻结温度", "幽灵球", "花枯萎"}, Features = "激光扫描模式下无法被检测到；可以穿透墙壁行进。"},
-    {Name = "Wendigo", CNName = "温迪戈", Evidences = {"鬼写字", "幽灵球", "幽灵点阵"}, Features = "惧怕明火，不会在火焰附近开始狩猎；能量越低移速越快。"},
-    {Name = "The Wisp", CNName = "鬼火", Evidences = {"幽灵球", "幽灵点阵", "花枯萎"}, Features = "可以穿过火焰；只能在自己最喜欢的房间开启狩猎。"},
-    {Name = "Wraith", CNName = "幽灵", Evidences = {"EMF5", "幽灵点阵"}, Features = "快速消耗猎人能量；不会触碰盐线。"}
+    {Name = "Aswang", CNName = "阿斯旺(毛血旺)", Evidences = {"EMF5", "幽灵写作", "花枯萎"}, Features = "踩盐减速 杀一个人会加速 正常情况下是常速鬼 加速只会保持一次猎杀"},
+    {Name = "Banshee", CNName = "灵兽（恶棍,女妖,妖精）", Evidences = {"冻结温度", "幽灵球", "指纹"}, Features = "在每次猎杀有概率触发独特的幽灵哭喊"},
+    {Name = "Demon", CNName = "恶魔", Evidences = {"EMF5", "冻结温度", "指纹"}, Features = "猎杀间隔短 猎杀理智是平均70%(比其他鬼多了10%) 有他的对局十字架范围变大还会飘起来旋转 要小心他有一个互动是把物体飘起来"},
+    {Name = "Doppelganger", CNName = "皮肤行者(拟魂)", Evidences = {"冻结温度", "幽灵写作", "通灵盒"}, Features = "无论有无证据都会有灵球 还会模仿其他鬼 如Vex(维克)的穿墙 Banshee(灵兽)的哭喊 the Wisp(鬼火)的穿火 小地图白给大地图听特征 萌新杀手"},
+    {Name = "Dullahan", CNName = "无头骑士", Evidences = {"冻结温度", "幽灵点阵", "花枯萎"}, Features = "追玩家的时候会越追越快 拍的照片是没有头的 需要注意有一个鬼是把头拿手上的 看手上有没有头"},
+    {Name = "Dybbuk", CNName = "迪布布克", Evidences = {"冻结温度", "指纹", "花枯萎"}, Features = "单人只能用排除法 因为他的特征是猎杀杀一个人有概率扔尸体 尸体是特别重的 如果尸体发生了比较大的位移九成是他 还有一成是一个椅子给玩家尸体砸了一下"},
+    {Name = "Entity", CNName = "实体", Evidences = {"指纹", "幽灵点阵", "通灵盒"}, Features = "猎杀和不猎杀的时候有概率传送东西 传送的时候有概率把自己传送到别的位置 遇到他就别想速通了除非你是气运之子 如果你看到有东西突然从天上掉下来就是entity(实体)"},
+    {Name = "Ghoul", CNName = "恶灵(白给王)", Evidences = {"冻结温度", "幽灵球", "通灵盒"}, Features = "在猎杀的时候不会影响通灵盒 紫外线 手电筒 摄像机 如果是他开局会有弹窗提示"},
+    {Name = "Keres", CNName = "克雷斯", Evidences = {"指纹", "通灵盒", "花枯萎"}, Features = "猎杀会找最低理智的人追杀 所有人理智为零会随机找一个 那个人不在房子里或者死了会找下一个 如果他选了你就会无视距离来追杀你 没有的话只要不正面看到就不会追杀你 杀人会减速"},
+    {Name = "Leviathan", CNName = "利维坦", Evidences = {"幽灵写作", "指纹", "幽灵球"}, Features = "他在非猎杀期间现身会影响周围电子设备让他们疯狂闪烁 他的关灯频率比其他鬼高很多 推荐在鬼房放点阵投影仪 紫外线 手电筒 摄像机 传奇白给王"},
+    {Name = "Nightmare", CNName = "梦魇", Evidences = {"EMF5", "幽灵球", "通灵盒"}, Features = "如果他在的房间开灯他的猎杀速度会晚十几二十秒左右 难度越高 他的猎杀间隔越少"},
+    {Name = "Oni", CNName = "恶鬼", Evidences = {"冻结温度", "幽灵点阵", "通灵盒"}, Features = "猎杀的时候永远为快速 他在4.07快到飞起来"},
+    {Name = "Phantom", CNName = "幻影", Evidences = {"EMF5", "指纹", "幽灵球"}, Features = "猎杀的时候不追人为高速 追人的时候为常速 并且闪烁速度变成规律的3秒一次"},
+    {Name = "Ravager", CNName = "掠夺者(龙卷风)", Evidences = {"EMF5", "幽灵写作", "通灵盒"}, Features = "他所有互动都是5级EMF 他是唯一一个可以在无证据给证据的 他猎杀的时候 有1/3的概率以自身为漩涡把东西都吸走 遇到这个鬼小心吸走的东西有些是实体会把你砸飞 并且有时候会猎的特别快 有时候有半天不猎杀 并且是所有鬼里唯一一个会一次性扔三个东西的 并且他扔东西一次是特别多的(补充:一个房间的灯开始剧烈闪烁100%是5级不拿EMF也能看出来, 并且哪个房间的灯轻微闪了一下就是鬼经过了这里或在这)"},
+    {Name = "Revenant", CNName = "复仇者(重返者)", Evidences = {"EMF5", "冻结温度", "幽灵写作"}, Features = "会在猎杀间隔没结束时提前猎杀 杀掉一个人会直接结束猎杀 (注意:最低难度什么鬼都是杀一个就结束)"},
+    {Name = "Shadow", CNName = "阴影", Evidences = {"EMF5", "幽灵写作", "幽灵点阵"}, Features = "正常天气鬼房温度不会降到10度以下 雪天不会降到0.5度以下 雨天不会降到五度以下 他在开了灯的房间猎杀速度会降低"},
+    {Name = "Siren", CNName = "海妖", Evidences = {"EMF5", "花枯萎", "通灵盒"}, Features = "如果玩家在猎杀时候被鬼追 那玩家速度会直接成老奶奶散步"},
+    {Name = "Specter", CNName = "幽影", Evidences = {"EMF5", "冻结温度", "幽灵点阵"}, Features = "他会一直呆在鬼房里 不会游荡 并且会连丢 如果在短时间内至少连丢两下就是连丢"},
+    {Name = "Spirit", CNName = "灵魂", Evidences = {"幽灵写作", "指纹", "通灵盒"}, Features = "鬼会把自己附近的光源变成蓝色的 蜡烛和灯笼有概率变色 猎杀时火焰100%为蓝色"},
+    {Name = "Umbra", CNName = "暗影生物", Evidences = {"指纹", "幽灵球", "幽灵点阵"}, Features = "走路时不会有声音"},
+    {Name = "Vesper", CNName = "维斯珀(夜鸦)", Evidences = {"幽灵写作", "指纹", "花枯萎"}, Features = "视力不详 听力极强 猎杀的时候只要你不动不拿道具不丢道具即便他贴脸上也不杀你 蹲下和转视角都不会死 但是附近EMF开着的话他就会杀你 并且地图有一点声音如走路都会无视距离来找你 疑似听到声音变成高速有人手持EMF开着他100%去找那个人"},
+    {Name = "Vex", CNName = "维克(愤怒)", Evidences = {"冻结温度", "幽灵球", "花枯萎"}, Features = "不会被点阵投影仪探测出来 并且可以穿墙"},
+    {Name = "Wendigo", CNName = "温迪戈", Evidences = {"幽灵写作", "幽灵球", "幽灵点阵"}, Features = "在有灯笼的房间不会猎杀 他的猎杀概率是普通鬼的两倍 并且玩家的平均理智越低速度越快 理智越高速度越慢 直到为正常速度 如果猎杀时候回复理智他会在下一轮猎杀降低速度"},
+    {Name = "The Wisp", CNName = "鬼火(地狱火)", Evidences = {"幽灵球", "幽灵点阵", "花枯萎"}, Features = "在猎杀和不猎杀时候都可以点燃周围蜡烛 并且猎杀时无视圣油直接穿过去 穿过火的时候身上会着火"},
+    {Name = "Wraith", CNName = "幽灵", Evidences = {"EMF5", "幽灵点阵", "通灵盒"}, Features = "和Blair一样永远不会踩盐"}
 }
 
 --所属功能：证据状态
@@ -570,11 +564,11 @@ local EvidenceConfirmed = {
 }
 local EvidenceNameMap = {
     EMF5 = "EMF5", Finger = "指纹", Orb = "幽灵球", Temp = "冻结温度",
-    Writing = "鬼写字", Flower = "花枯萎", Dots = "幽灵点阵"
+    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵"
 }
 local EvidenceDisplayName = {
     EMF5 = "EMF5级", Finger = "指纹", Orb = "幽灵球", Temp = "冻结温度",
-    Writing = "鬼写字", Flower = "花枯萎", Dots = "幽灵点阵"
+    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵"
 }
 
 --所属功能：证据判断
@@ -610,8 +604,8 @@ local function getPositiveEvidenceCount()
 end
 
 --所属功能：证据Paragraph
-local EvidenceParagraph = TabEvidence:Paragraph({Title = "证据", Desc = "等待证据检测..."})
-local GhostSearchParagraph = TabEvidence:Paragraph({Title = "幽灵检索", Desc = "正在等待证据..."})
+local EvidenceParagraph = TabEvidence:Paragraph({Title = "证据", Desc = "正在检测..."})
+local GhostSearchParagraph = TabEvidence:Paragraph({Title = "幽灵筛选", Desc = "正在检测..."})
 
 --所属功能：证据文本
 local function getEvidenceStatusText(name)
@@ -626,11 +620,11 @@ local function buildEvidenceText()
         table.insert(lines, EvidenceDisplayName[name] .. "：" .. getEvidenceStatusText(name))
     end
     table.insert(lines, "")
-    table.insert(lines, "🟩 已发现　🟥 已确认不存在　❔ 未确认")
+    table.insert(lines, "🟩 有证据　🟥 无证据　❔ 未获取到（可能没有）")
     return table.concat(lines, "\n")
 end
 
---所属功能：幽灵检索
+--所属功能：幽灵筛选
 local GhostDropdownValues = {"请选择幽灵"}
 local GhostDataMap = {}
 local SelectedGhostDisplay
@@ -651,7 +645,7 @@ local function buildGhostSearchText()
     local positiveCount = getPositiveEvidenceCount()
     local lines = {}
     if #possible == 0 then
-        return "状态：❌ 没有符合当前证据的幽灵"
+        return "状态：🟥 没有筛选出来"
     end
     if #possible == 1 and positiveCount >= 3 then
         local ghost = possible[1]
@@ -661,12 +655,12 @@ local function buildGhostSearchText()
         table.insert(lines, "特征：" .. ghost.Features)
     else
         table.insert(lines, "状态：🔎 正在筛选")
-        table.insert(lines, "候选数量：" .. #possible)
+        table.insert(lines, "可能幽灵数量：" .. #possible)
         local names = {}
         for _, ghost in ipairs(possible) do
             table.insert(names, ghost.Name .. " [" .. ghost.CNName .. "]")
         end
-        table.insert(lines, "候选：" .. table.concat(names, "、"))
+        table.insert(lines, "可能的幽灵：" .. table.concat(names, "、"))
     end
     if SelectedGhostDisplay and GhostDataMap[SelectedGhostDisplay] then
         local ghost = GhostDataMap[SelectedGhostDisplay]
@@ -784,7 +778,6 @@ task.defer(function()
 end)
 
 local function getSafePosition()
-    -- 尝试SpawnLocation
     local spawn = workspace:FindFirstChild("SpawnLocation")
     if spawn then
         if spawn:IsA("BasePart") then return spawn.Position end
@@ -793,7 +786,6 @@ local function getSafePosition()
             if root then return root.Position end
         end
     end
-    -- 尝试Base Camp房间
     local map = workspace:FindFirstChild("Map")
     local rooms = map and map:FindFirstChild("Rooms")
     if rooms then
@@ -803,9 +795,7 @@ local function getSafePosition()
             if root then return root.Position end
         end
     end
-    -- 回退到初始出生点
     if InitialSpawnPosition then return InitialSpawnPosition end
-    -- 最后回退
     return Vector3.new(0, 10, 0)
 end
 
@@ -827,12 +817,12 @@ local function watchGhostHunting(ghost)
     local connection = ghost:GetAttributeChangedSignal("Hunting"):Connect(function()
         if ScriptClosed or not HuntingNotifyEnabled then return end
         if ghost:GetAttribute("Hunting") == true then
-            Notify("👻 幽灵开始猎杀", 1)
+            Notify("猎杀开始", 1)
             if AutoAvoidEnabled then
                 teleportToSafePosition()
             end
         else
-            Notify("👻 猎杀结束", 1)
+            Notify("猎杀结束", 1)
         end
     end)
     table.insert(HuntingConnections, connection)
@@ -840,7 +830,7 @@ end
 
 TabGhost:Toggle({
     Title = "猎杀提示",
-    Desc = "监听幽灵 Hunting 属性",
+    Desc = "在幽灵猎杀时弹窗提醒",
     Default = false,
     Callback = function(value)
         HuntingNotifyEnabled = value
@@ -853,8 +843,8 @@ TabGhost:Toggle({
 })
 
 TabGhost:Toggle({
-    Title = "自动躲避猎杀",
-    Desc = "幽灵猎杀时传送到出生点",
+    Title = "猎杀传送",
+    Desc = "幽灵猎杀时传送到外面",
     Default = false,
     Callback = function(value)
         AutoAvoidEnabled = value
@@ -870,7 +860,7 @@ local ESPMap = {
 
 TabGhost:Dropdown({
     Title = "透视",
-    Desc = "可以同时开启多个透视",
+    Desc = "👁👁这个我不想解释",
     Values = ESPNames,
     Multi = true,
     AllowNone = true,
@@ -957,7 +947,7 @@ TabItems:Button({
 })
 
 TabItems:Button({
-    Title = "物品到幽灵",
+    Title = "把物品传送到幽灵位置",
     Callback = function()
         local item = ItemDataMap[SelectedItemString]
         local ghost = getGhostModel()
@@ -971,7 +961,7 @@ TabItems:Button({
 })
 
 TabItems:Button({
-    Title = "物品到身边",
+    Title = "把物品传送到身边",
     Callback = function()
         local item = ItemDataMap[SelectedItemString]
         local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -998,7 +988,7 @@ local OriginalGlobalShadows
 --所属功能：无限体力
 TabPlayer:Toggle({
     Title = "无限体力",
-    Desc = "持续保持体力100",
+    Desc = "锁定体力在满体力",
     Default = false,
     Callback = function(value)
         InfiniteStaminaEnabled = value
@@ -1024,7 +1014,7 @@ TabPlayer:Toggle({
 --所属功能：穿墙
 TabPlayer:Toggle({
     Title = "穿墙",
-    Desc = "关闭后恢复碰撞",
+    Desc = "有点小bug，关闭可能会卡住",
     Default = false,
     Callback = function(value)
         NoclipEnabled = value
@@ -1047,7 +1037,7 @@ TabPlayer:Toggle({
 --所属功能：全局明亮
 TabPlayer:Toggle({
     Title = "全局明亮",
-    Desc = "提高环境亮度",
+    Desc = "谁扔闪光弹了？",
     Default = false,
     Callback = function(value)
         BrightnessEnabled = value
@@ -1080,7 +1070,7 @@ TabPlayer:Toggle({
 --所属功能：玩家速度
 TabPlayer:Input({
     Title = "玩家速度",
-    Desc = "-1恢复默认16",
+    Desc = "输入-1恢复",
     Placeholder = "-1",
     Numeric = true,
     Callback = function(value)
@@ -1096,6 +1086,7 @@ TabPlayer:Input({
 --所属功能：重置人物
 TabPlayer:Button({
     Title = "重置人物",
+    Desc = "他当场就死了！",
     Callback = function()
         local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
         if humanoid then humanoid.Health = 0 end
@@ -1153,6 +1144,7 @@ end
 
 TabPlayer:Button({
     Title = "更改房间",
+    Desc = "将人物的位置判定在指定房间不改变位置",
     Callback = function()
         local raw = RawRoomNames[SelectedRoom]
         if raw then setPlayerCurrentRoom(raw) end
@@ -1166,7 +1158,7 @@ local LockedRoomRawName
 
 TabPlayer:Toggle({
     Title = "锁定房间",
-    Desc = "保持CurrentRoom不变",
+    Desc = "把房间判定锁定在选项中房间",
     Default = false,
     Callback = function(value)
         RoomLockEnabled = value
@@ -1198,12 +1190,12 @@ TabPlayer:Button({
 --所属功能：地图
 TabMap:Button({
     Title = "删除所有门",
-    Desc = "删除workspace.Doors",
+    Desc = "删除地图中所有门，可能会被拉回",
     Callback = function()
         local doors = workspace:FindFirstChild("Doors")
         if doors then
             doors:Destroy()
-            Notify("所有门已删除", 1)
+            Notify("开始你的拉回之旅", 1)
         end
     end
 })
@@ -1222,7 +1214,7 @@ local function updateMenuGhostInfo()
     if not GhostInfoEnabled or ScriptClosed then return end
     local ghost = getGhostModel()
     if not ghost then
-        GhostInfoLabel.Text = "👻 幽灵信息\n幽灵：筛选\n年龄：-\n当前房间：-\n鬼房：-\n鬼房温度：-\n幽灵球：-\n性别：-\n打碎玻璃：-\n速度：-\n最高速度：-\n猎杀中：🟥"
+        GhostInfoLabel.Text = "幽灵信息\n幽灵：筛选\n年龄：-\n当前房间：-\n鬼房：-\n鬼房温度：-\n幽灵球：-\n性别：-\n打碎玻璃：-\n速度：-\n最高速度：-\n猎杀中：🟥"
         return
     end
     local age = getAttributeAny(ghost, {"Age", "GhostAge"}) or "-"
@@ -1242,7 +1234,7 @@ local function updateMenuGhostInfo()
     local possible = getPossibleGhostList()
     local ghostName = #possible == 1 and possible[1].CNName or "筛选"
     GhostInfoLabel.Text = string.format(
-        "👻 幽灵信息\n幽灵：%s\n年龄：%s\n当前房间：%s\n鬼房：%s\n鬼房温度：%s\n幽灵球：%s\n性别：%s\n打碎玻璃：%s次\n速度：%s\n最高速度：%s\n猎杀中：%s",
+        "幽灵信息\n幽灵：%s\n年龄：%s\n当前房间：%s\n鬼房：%s\n鬼房温度：%s\n幽灵球：%s\n性别：%s\n打碎玻璃：%s次\n速度：%s\n最高速度：%s\n猎杀中：%s",
         ghostName, tostring(age), currentRoom, ghostRoom,
         ghostTemp and string.format("%.2f℃", ghostTemp) or "-",
         orb, gender, glassBreaks, speedText, maxSpeedText, hunting
@@ -1255,7 +1247,7 @@ local function updatePlayerInfo()
     local room = roomName and translate(roomName) or "无"
     local temperature = roomName and (getRoomTemperatureByName(roomName) or 0) or 0
     local energy = LocalPlayer:GetAttribute("Energy") or LocalPlayer:GetAttribute("Sanity") or 100
-    PlayerStatsLabel.Text = string.format("玩家\n房间：%s\n温度：%.2f℃\n理智：%d%%", room, temperature, math.clamp(math.round(tonumber(energy) or 100), 0, 100))
+    PlayerStatsLabel.Text = string.format("玩家\n房间：%s\n温度：%.2f℃\n理智：%d%%", room, temperature, math.clamp(math.floor(tonumber(energy) or 100), 0, 100))
 end
 
 local GhostInfoConnection = RunService.Heartbeat:Connect(function()
@@ -1412,7 +1404,7 @@ task.spawn(function()
             if not EvidenceState.Writing and checkGhostWriting() then
                 EvidenceState.Writing = true
                 EvidenceConfirmed.Writing = true
-                Notify("鬼写字", 1)
+                Notify("幽灵写作", 1)
             end
             if not EvidenceState.Flower and checkWitheredFlower() then
                 EvidenceState.Flower = true
@@ -1449,7 +1441,7 @@ local cleanupScript
 
 TabSettings:Button({
     Title = "关闭脚本",
-    Desc = "清理全部功能与UI",
+    Desc = "字面意思",
     Callback = function()
         if cleanupScript then cleanupScript() end
     end
