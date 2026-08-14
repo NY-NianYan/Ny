@@ -39,7 +39,7 @@ end
 local function Notify(text, duration)
     playNotifySound()
     pcall(function()
-        WindUI:Notify({Title = "NY恶魔学", Content = tostring(text), Duration = duration or 1})
+        WindUI:Notify({Title = "NY恶魔学", Content = tostring(text), Duration = 2})
     end)
 end
 
@@ -514,8 +514,8 @@ local function createRoundedInfoBox(name, size, textColor)
     return background, label
 end
 
---所属功能：幽灵信息框
-local GhostInfoBackground, GhostInfoLabel = createRoundedInfoBox("GhostInfo", UDim2.fromOffset(90, 145), Color3.fromRGB(0, 255, 255))
+--所属功能：幽灵信息框（高度改为100）
+local GhostInfoBackground, GhostInfoLabel = createRoundedInfoBox("GhostInfo", UDim2.fromOffset(100, 140), Color3.fromRGB(0, 255, 255))
 --所属功能：玩家信息框
 local PlayerInfoBackground, PlayerStatsLabel = createRoundedInfoBox("PlayerInfo", UDim2.fromOffset(90, 45), Color3.new(1, 1, 1))
 GhostInfoBackground.LayoutOrder = 1
@@ -553,22 +553,76 @@ local Ghosts = {
     {Name = "Wraith", CNName = "幽灵", Evidences = {"EMF5", "幽灵点阵", "通灵盒"}, Features = "和Blair一样永远不会踩盐"}
 }
 
+--所属功能：日志幽灵翻译
+local JournalGhostTranslations = {}
+for _, ghost in ipairs(Ghosts) do
+    JournalGhostTranslations[ghost.Name] = ghost.CNName
+end
+
+local JournalTranslationEnabled = false
+local JournalOriginalTexts = {}
+local JournalTranslationConnection
+
+local function translateJournalGhosts()
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    local journal = playerGui and playerGui:FindFirstChild("Journal")
+    local holder = journal and journal:FindFirstChild("Holder")
+    local pages = holder and holder:FindFirstChild("Pages")
+    local page4 = pages and pages:FindFirstChild("Page4")
+    local right = page4 and page4:FindFirstChild("Right")
+    local page = right and right:FindFirstChild("Page")
+    local ghostTypes = page and page:FindFirstChild("GhostTypes")
+    if not ghostTypes then return end
+    for ghostName, cnName in pairs(JournalGhostTranslations) do
+        local entry = ghostTypes:FindFirstChild(ghostName)
+        local label = entry and entry:FindFirstChild("TextLabel")
+        if label and label:IsA("TextLabel") then
+            if JournalOriginalTexts[label] == nil then JournalOriginalTexts[label] = label.Text end
+            label.Text = cnName
+        end
+    end
+end
+
+local function restoreJournalGhosts()
+    for label, text in pairs(JournalOriginalTexts) do
+        if label and label.Parent then label.Text = text end
+    end
+    table.clear(JournalOriginalTexts)
+end
+
+local function setJournalTranslation(value)
+    JournalTranslationEnabled = value
+    if JournalTranslationConnection then
+        JournalTranslationConnection:Disconnect()
+        JournalTranslationConnection = nil
+    end
+    if value then
+        translateJournalGhosts()
+        JournalTranslationConnection = LocalPlayer.PlayerGui.DescendantAdded:Connect(function(object)
+            if not JournalTranslationEnabled or ScriptClosed then return end
+            if object.Name == "TextLabel" then task.defer(translateJournalGhosts) end
+        end)
+    else
+        restoreJournalGhosts()
+    end
+end
+
 --所属功能：证据状态
 local EvidenceState = {
     EMF5 = false, Finger = false, Orb = false, Temp = false,
-    Writing = false, Flower = false, Dots = false
+    Writing = false, Flower = false, Dots = false, Box = false
 }
 local EvidenceConfirmed = {
     EMF5 = false, Finger = false, Orb = false, Temp = false,
-    Writing = false, Flower = false, Dots = false
+    Writing = false, Flower = false, Dots = false, Box = false
 }
 local EvidenceNameMap = {
     EMF5 = "EMF5", Finger = "指纹", Orb = "幽灵球", Temp = "冻结温度",
-    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵"
+    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵", Box = "通灵盒"
 }
 local EvidenceDisplayName = {
     EMF5 = "EMF5级", Finger = "指纹", Orb = "幽灵球", Temp = "冻结温度",
-    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵"
+    Writing = "幽灵写作", Flower = "花枯萎", Dots = "幽灵点阵", Box = "通灵盒"
 }
 
 --所属功能：证据判断
@@ -609,18 +663,21 @@ local GhostSearchParagraph = TabEvidence:Paragraph({Title = "幽灵筛选", Desc
 
 --所属功能：证据文本
 local function getEvidenceStatusText(name)
-    if not EvidenceConfirmed[name] then return "❔" end
-    return EvidenceState[name] and "🟩" or "🟥"
+    if EvidenceConfirmed[name] and EvidenceState[name] then
+        return "🟩"
+    else
+        return "🟥"
+    end
 end
 
 local function buildEvidenceText()
     local lines = {"自动检测结果", ""}
-    local ordered = {"EMF5", "Finger", "Orb", "Temp", "Writing", "Flower", "Dots"}
+    local ordered = {"EMF5", "Finger", "Orb", "Temp", "Writing", "Flower", "Dots", "Box"}
     for _, name in ipairs(ordered) do
         table.insert(lines, EvidenceDisplayName[name] .. "：" .. getEvidenceStatusText(name))
     end
     table.insert(lines, "")
-    table.insert(lines, "🟩 有证据　🟥 无证据　❔ 未获取到（可能没有）")
+    table.insert(lines, "🟩 有证据　🟥 无证据")
     return table.concat(lines, "\n")
 end
 
@@ -725,7 +782,7 @@ GhostSelector = TabEvidence:Dropdown({
         if not ghost then return end
         if SelectedGhostDisplay ~= value then
             SelectedGhostDisplay = value
-            Notify("已选择：" .. ghost.Name .. " [" .. ghost.CNName .. "]", 1)
+            Notify("已选择：" .. ghost.Name .. " [" .. ghost.CNName .. "]")
         end
         updateEvidenceUI()
     end
@@ -739,6 +796,14 @@ TabEvidence:Button({
         LastGhostDropdownSignature = nil
         refreshGhostQuery()
     end
+})
+
+--所属功能：幽灵翻译开关
+TabEvidence:Toggle({
+    Title = "幽灵翻译",
+    Desc = "将日志中的幽灵名称切换为中文",
+    Default = false,
+    Callback = setJournalTranslation
 })
 
 --所属功能：属性小窗
@@ -768,88 +833,43 @@ end
 
 --所属功能：自动躲避猎杀
 local AutoAvoidEnabled = false
-local InitialSpawnPosition = nil
-
--- 记录初始出生点
-task.defer(function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        InitialSpawnPosition = LocalPlayer.Character.HumanoidRootPart.Position
-    end
-end)
-
-local function getSafePosition()
-    local spawn = workspace:FindFirstChild("SpawnLocation")
-    if spawn then
-        if spawn:IsA("BasePart") then return spawn.Position end
-        if spawn:IsA("Model") then
-            local root = getRoot(spawn)
-            if root then return root.Position end
-        end
-    end
-    local map = workspace:FindFirstChild("Map")
-    local rooms = map and map:FindFirstChild("Rooms")
-    if rooms then
-        local baseCamp = rooms:FindFirstChild("Base Camp")
-        if baseCamp then
-            local root = getRoot(baseCamp)
-            if root then return root.Position end
-        end
-    end
-    if InitialSpawnPosition then return InitialSpawnPosition end
-    return Vector3.new(0, 10, 0)
-end
 
 local function teleportToSafePosition()
-    local character = LocalPlayer.Character
-    if not character then return end
-    local root = character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    local pos = getSafePosition()
-    if pos then
-        root.CFrame = CFrame.new(pos)
+    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local spawns = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Spawns")
+    local spawn = spawns and spawns:GetChildren()[6]
+    if root and spawn then
+        local target = spawn:IsA("BasePart") and spawn or getRoot(spawn)
+        if target then root.CFrame = target.CFrame + Vector3.new(0, 3, 0) end
     end
 end
 
 local function watchGhostHunting(ghost)
     if not ghost or not ghost:IsA("Model") or HuntingGhost == ghost then return end
-    disconnectHuntingConnections()
-    HuntingGhost = ghost
-    local connection = ghost:GetAttributeChangedSignal("Hunting"):Connect(function()
-        if ScriptClosed or not HuntingNotifyEnabled then return end
-        if ghost:GetAttribute("Hunting") == true then
-            Notify("猎杀开始", 1)
-            if AutoAvoidEnabled then
-                teleportToSafePosition()
-            end
-        else
-            Notify("猎杀结束", 1)
-        end
-    end)
-    table.insert(HuntingConnections, connection)
+    disconnectHuntingConnections(); HuntingGhost = ghost
+    local function update()
+        if ScriptClosed then return end
+        local hunting = ghost:GetAttribute("Hunting") == true
+        if hunting and AutoAvoidEnabled then teleportToSafePosition() end
+        if HuntingNotifyEnabled then Notify(hunting and "猎杀开始" or "猎杀结束") end
+    end
+    table.insert(HuntingConnections, ghost:GetAttributeChangedSignal("Hunting"):Connect(update))
+    update()
 end
 
-TabGhost:Toggle({
-    Title = "猎杀提示",
-    Desc = "在幽灵猎杀时弹窗提醒",
-    Default = false,
-    Callback = function(value)
-        HuntingNotifyEnabled = value
-        disconnectHuntingConnections()
-        if value then
-            local ghost = getGhostModel()
-            if ghost then watchGhostHunting(ghost) end
-        end
-    end
-})
+TabGhost:Toggle({Title = "猎杀提示", Desc = "在幽灵猎杀时弹窗提醒", Default = false, Callback = function(value)
+    HuntingNotifyEnabled = value
+    local ghost = getGhostModel(); if ghost then watchGhostHunting(ghost) end
+end})
 
-TabGhost:Toggle({
-    Title = "猎杀传送",
-    Desc = "幽灵猎杀时传送到外面",
-    Default = false,
-    Callback = function(value)
-        AutoAvoidEnabled = value
+TabGhost:Toggle({Title = "猎杀传送", Desc = "幽灵猎杀时传送到安全点", Default = false, Callback = function(value)
+    AutoAvoidEnabled = value
+    local ghost = getGhostModel()
+    if ghost then
+        watchGhostHunting(ghost)
+        if value and ghost:GetAttribute("Hunting") == true then teleportToSafePosition() end
     end
-})
+end})
 
 --所属功能：ESP菜单
 local ESPNames = {"幽灵", "玩家", "发电机", "指纹", "物品", "诅咒道具", "幽灵球", "蜡烛"}
@@ -1195,18 +1215,21 @@ TabMap:Button({
         local doors = workspace:FindFirstChild("Doors")
         if doors then
             doors:Destroy()
-            Notify("开始你的拉回之旅", 1)
+            Notify("开始你的拉回之旅")
         end
     end
 })
 
 --所属功能：玻璃次数
-local function getGlassBreakCount(ghost)
-    if not ghost then return "-" end
-    local value = getAttributeAny(ghost, {"GlassBreaks", "GlassBreakCount", "GlassBroken", "BrokenGlass", "BrokenGlassCount", "ShatteredGlass", "GlassBreaksCount"})
-    if typeof(value) == "number" then return tostring(math.max(0, math.floor(value))) end
-    if typeof(value) == "boolean" then return value and "1" or "0" end
-    return "-"
+local function getGlassBreakCount()
+    local folder = workspace:FindFirstChild("BrokenGlass")
+    return folder and tostring(#folder:GetChildren()) or "0"
+end
+
+--所属功能：踩盐检测
+local function checkDisturbedSalt()
+    local salt = workspace:FindFirstChild("SaltPiles")
+    return salt and salt:FindFirstChild("DisturbedSaltLine") ~= nil or false
 end
 
 --所属功能：幽灵信息
@@ -1214,7 +1237,7 @@ local function updateMenuGhostInfo()
     if not GhostInfoEnabled or ScriptClosed then return end
     local ghost = getGhostModel()
     if not ghost then
-        GhostInfoLabel.Text = "幽灵信息\n幽灵：筛选\n年龄：-\n当前房间：-\n鬼房：-\n鬼房温度：-\n幽灵球：-\n性别：-\n打碎玻璃：-\n速度：-\n最高速度：-\n猎杀中：🟥"
+        GhostInfoLabel.Text = "幽灵信息\n幽灵：筛选\n年龄：-\n当前房间：-\n鬼房：-\n鬼房温度：-\n幽灵球：-\n性别：-\n打碎玻璃：0次\n踩盐：🟥\n速度：-\n最高速度：-\n猎杀中：🟥"
         return
     end
     local age = getAttributeAny(ghost, {"Age", "GhostAge"}) or "-"
@@ -1226,18 +1249,26 @@ local function updateMenuGhostInfo()
     local ghostTemp = getRoomTemperatureByName(ghostRoomRaw)
     local orb = detectGhostOrb() and "🟩" or "🟥"
     local hunting = ghost:GetAttribute("Hunting") == true and "🟩" or "🟥"
-    local glassBreaks = getGlassBreakCount(ghost)
+    local glassBreaks = getGlassBreakCount()
+    local disturbedSalt = checkDisturbedSalt() and "🟩" or "🟥"
     local speed = getGhostSpeed(ghost)
     local maxSpeed = getGhostMaxSpeed(ghost)
     local speedText = speed and string.format("%.1f", speed) or "-"
     local maxSpeedText = maxSpeed and string.format("%.1f", maxSpeed) or "-"
     local possible = getPossibleGhostList()
-    local ghostName = #possible == 1 and possible[1].CNName or "筛选"
+    local ghostName = "筛选"
+    if #possible == 1 then
+        if JournalTranslationEnabled then
+            ghostName = possible[1].CNName
+        else
+            ghostName = possible[1].Name
+        end
+    end
     GhostInfoLabel.Text = string.format(
-        "幽灵信息\n幽灵：%s\n年龄：%s\n当前房间：%s\n鬼房：%s\n鬼房温度：%s\n幽灵球：%s\n性别：%s\n打碎玻璃：%s次\n速度：%s\n最高速度：%s\n猎杀中：%s",
+        "幽灵信息\n幽灵：%s\n年龄：%s\n当前房间：%s\n鬼房：%s\n鬼房温度：%s\n幽灵球：%s\n性别：%s\n打碎玻璃：%s次\n踩盐：%s\n速度：%s\n最高速度：%s\n猎杀中：%s",
         ghostName, tostring(age), currentRoom, ghostRoom,
         ghostTemp and string.format("%.2f℃", ghostTemp) or "-",
-        orb, gender, glassBreaks, speedText, maxSpeedText, hunting
+        orb, gender, glassBreaks, disturbedSalt, speedText, maxSpeedText, hunting
     )
 end
 
@@ -1255,6 +1286,26 @@ local GhostInfoConnection = RunService.Heartbeat:Connect(function()
         updateMenuGhostInfo()
         updatePlayerInfo()
     end
+end)
+
+--所属功能：电闸检测
+local FuseBoxConnection
+local FuseBoxWatcher
+local FuseBoxLastEnabled
+local function watchFuseBox()
+    local fuse = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("FuseBox")
+    if not fuse or FuseBoxConnection then return end
+    FuseBoxLastEnabled = fuse.Enabled
+    FuseBoxConnection = fuse:GetPropertyChangedSignal("Enabled"):Connect(function()
+        if ScriptClosed then return end
+        local enabled = fuse.Enabled
+        if FuseBoxLastEnabled == true and enabled == false then Notify("电闸被关闭") end
+        FuseBoxLastEnabled = enabled
+    end)
+end
+watchFuseBox()
+FuseBoxWatcher = workspace.DescendantAdded:Connect(function(object)
+    if not ScriptClosed and object.Name == "FuseBox" then task.defer(watchFuseBox) end
 end)
 
 --所属功能：EMF5检测
@@ -1294,20 +1345,12 @@ local function checkFreezing()
     return false
 end
 
---所属功能：点阵检测
-local function checkDots()
-    local ghost = getGhostModel()
-    return ghost and ghost:GetAttribute("LaserVisible") == true or false
-end
-
---所属功能：鬼写字检测
+--所属功能：幽灵写作检测
 local function checkGhostWriting()
-    local items = workspace:FindFirstChild("Items")
-    if not items then return false end
-    for _, item in ipairs(items:GetChildren()) do
-        if item:GetAttribute("ItemName") == "Spirit Book" then
-            if item:GetAttribute("PhotoRewardType") == "Inscription" or item:GetAttribute("Disabled") == true then return true end
-        end
+    local scratch = workspace:FindFirstChild("ScratchText")
+    if not scratch then return false end
+    for _, object in ipairs(scratch:GetChildren()) do
+        if object:GetAttribute("PhotoRewardType") == "Inscription" then return true end
     end
     return false
 end
@@ -1324,6 +1367,54 @@ local function checkWitheredFlower()
     return false
 end
 
+--所属功能：通灵盒检测
+local SpiritBoxConnections, SpiritBoxWatched = {}, {}
+
+local function disconnectSpiritBox()
+    for _, connection in ipairs(SpiritBoxConnections) do pcall(connection.Disconnect, connection) end
+    table.clear(SpiritBoxConnections); table.clear(SpiritBoxWatched)
+end
+
+local function isSpiritBox(model)
+    return model and model:IsA("Model") and model:GetAttribute("ItemName") == "Spirit Box"
+end
+
+local function watchSpiritBox(model)
+    if not isSpiritBox(model) or SpiritBoxWatched[model] then return end
+    local handle = model:FindFirstChild("Handle", true); if not handle then return end
+    SpiritBoxWatched[model] = true
+    local function found(sound) return sound:IsA("Sound") and sound.Name ~= "Tone" end
+    local function record()
+        if EvidenceState.Box then return end
+        for _, child in ipairs(handle:GetChildren()) do
+            if found(child) then
+                EvidenceState.Box, EvidenceConfirmed.Box = true, true
+                Notify("通灵盒"); updateEvidenceUI(); refreshGhostQuery(); return
+            end
+        end
+        EvidenceConfirmed.Box = true
+    end
+    table.insert(SpiritBoxConnections, handle.ChildAdded:Connect(function(child)
+        if not ScriptClosed and found(child) then
+            EvidenceState.Box, EvidenceConfirmed.Box = true, true
+            Notify("通灵盒"); updateEvidenceUI(); refreshGhostQuery()
+        end
+    end))
+    record()
+end
+
+local function scanSpiritBox()
+    local found, roots = false, {workspace:FindFirstChild("Item"), workspace:FindFirstChild("Items"), workspace:FindFirstChild(LocalPlayer.Name), LocalPlayer.Character}
+    for _, root in ipairs(roots) do
+        if root then
+            for _, object in ipairs(root:GetDescendants()) do
+                if isSpiritBox(object) then found = true; watchSpiritBox(object) end
+            end
+        end
+    end
+    if not found and not EvidenceState.Box then EvidenceConfirmed.Box = true end
+end
+
 --所属功能：幽灵球初始化
 local GhostOrbInitialized = false
 
@@ -1333,7 +1424,7 @@ local function initializeGhostOrb()
     GhostOrbInitialized = true
     EvidenceConfirmed.Orb = true
     EvidenceState.Orb = orbExists
-    Notify(orbExists and "幽灵球" or "幽灵球：🟥", 1)
+    Notify(orbExists and "幽灵球" or "幽灵球：🟥")
     updateEvidenceUI()
     refreshGhostQuery()
 end
@@ -1356,7 +1447,7 @@ local function watchGhostDots(ghost)
         if ghost:GetAttribute("LaserVisible") == true and not EvidenceState.Dots then
             EvidenceState.Dots = true
             EvidenceConfirmed.Dots = true
-            Notify("幽灵点阵", 1)
+            Notify("幽灵点阵")
             updateEvidenceUI()
             refreshGhostQuery()
         end
@@ -1374,8 +1465,18 @@ local GhostWatcher = workspace.DescendantAdded:Connect(function(object)
         task.defer(function()
             if ScriptClosed then return end
             watchGhostDots(object)
-            if HuntingNotifyEnabled then watchGhostHunting(object) end
+            watchGhostHunting(object)
         end)
+    end
+end)
+
+--所属功能：幽灵写作监听
+local ScratchWatcher = workspace.DescendantAdded:Connect(function(object)
+    if ScriptClosed then return end
+    local scratch = workspace:FindFirstChild("ScratchText")
+    if scratch and object:IsDescendantOf(scratch) and object:GetAttribute("PhotoRewardType") == "Inscription" and not EvidenceState.Writing then
+        EvidenceState.Writing, EvidenceConfirmed.Writing = true, true
+        Notify("幽灵写作"); updateEvidenceUI(); refreshGhostQuery()
     end
 end)
 
@@ -1388,33 +1489,33 @@ task.spawn(function()
             if not EvidenceState.EMF5 and checkEMF5() then
                 EvidenceState.EMF5 = true
                 EvidenceConfirmed.EMF5 = true
-                Notify("EMF5", 1)
+                Notify("EMF5")
             end
             if not EvidenceState.Finger and checkFingerprints() then
                 EvidenceState.Finger = true
                 EvidenceConfirmed.Finger = true
-                Notify("指纹", 1)
+                Notify("指纹")
             end
             if not GhostOrbInitialized then initializeGhostOrb() end
             if not EvidenceState.Temp and checkFreezing() then
                 EvidenceState.Temp = true
                 EvidenceConfirmed.Temp = true
-                Notify("冻结温度", 1)
+                Notify("冻结温度")
             end
             if not EvidenceState.Writing and checkGhostWriting() then
                 EvidenceState.Writing = true
                 EvidenceConfirmed.Writing = true
-                Notify("幽灵写作", 1)
+                Notify("幽灵写作")
             end
             if not EvidenceState.Flower and checkWitheredFlower() then
                 EvidenceState.Flower = true
                 EvidenceConfirmed.Flower = true
-                Notify("花枯萎", 1)
+                Notify("花枯萎")
             end
             local ghost = getGhostModel()
             if ghost then
                 watchGhostDots(ghost)
-                if HuntingNotifyEnabled then watchGhostHunting(ghost) end
+                watchGhostHunting(ghost)
             end
             updateEvidenceUI()
             refreshGhostQuery()
@@ -1427,6 +1528,7 @@ task.defer(function()
     task.wait(0.5)
     if ScriptClosed then return end
     initializeGhostOrb()
+    scanSpiritBox()
     local ghost = getGhostModel()
     if ghost then
         watchGhostDots(ghost)
@@ -1461,6 +1563,12 @@ cleanupScript = function()
     AutoAvoidEnabled = false
     disconnectHuntingConnections()
     disconnectDotsConnection()
+    disconnectSpiritBox()
+    if ScratchWatcher then pcall(function() ScratchWatcher:Disconnect() end) ScratchWatcher = nil end
+    if JournalTranslationConnection then pcall(function() JournalTranslationConnection:Disconnect() end) JournalTranslationConnection = nil end
+    restoreJournalGhosts()
+    if FuseBoxConnection then pcall(function() FuseBoxConnection:Disconnect() end) FuseBoxConnection = nil end
+    if FuseBoxWatcher then pcall(function() FuseBoxWatcher:Disconnect() end) FuseBoxWatcher = nil end
 
     if GhostWatcher then pcall(function() GhostWatcher:Disconnect() end) GhostWatcher = nil end
 
@@ -1503,4 +1611,4 @@ end
 --所属功能：最终初始化
 updateEvidenceUI()
 refreshGhostQuery()
-Notify("NY恶魔学加载完成", 1)
+Notify("NY恶魔学加载完成")
